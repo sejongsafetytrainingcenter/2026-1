@@ -30,7 +30,7 @@ margin-bottom:40px;
 color:#444;
 }
 
-/* 그룹 버튼 */
+/* 그룹 버튼 공통 */
 
 #group button{
 font-size:38px;
@@ -38,15 +38,26 @@ padding:30px 60px;
 margin:25px;
 border:none;
 border-radius:25px;
-background:#ffd54f;
 cursor:pointer;
 box-shadow:0 10px 20px rgba(0,0,0,0.15);
 transition:0.2s;
+color:white;
+}
+
+/* 유아 버튼 (기존색 유지) */
+
+.kinder{
+background:#ffa726;
+}
+
+/* 초등 버튼 (새 색) */
+
+.elementary{
+background:#42a5f5;
 }
 
 #group button:hover{
 transform:scale(1.05);
-background:#ffca28;
 }
 
 /* 질문 박스 */
@@ -109,6 +120,7 @@ font-size:70px;
 font-weight:bold;
 color:#333;
 display:none;
+z-index:9999;
 }
 
 </style>
@@ -127,11 +139,11 @@ display:none;
 
 <h2>나는 어떤 친구일까요?</h2>
 
-<button onclick="selectGroup('유아')">
+<button class="kinder" onclick="selectGroup('유아')">
 유치원 / 어린이집
 </button>
 
-<button onclick="selectGroup('초등')">
+<button class="elementary" onclick="selectGroup('초등')">
 초등학교 저학년
 </button>
 
@@ -180,13 +192,16 @@ if(lock) return;
 
 lock=true;
 
-/* 모든 버튼 비활성화 */
-document.querySelectorAll("button").forEach(b=>b.disabled=true);
+/* 감사 화면 먼저 표시 (버튼 가리기) */
 
-/* 즉시 감사 화면 표시 */
 document.getElementById("thanks").style.display="flex";
 
+/* 모든 버튼 비활성화 */
+
+document.querySelectorAll("button").forEach(b=>b.disabled=true);
+
 /* 구글 시트로 데이터 전송 */
+
 fetch(sheetURL,{
 method:"POST",
 body:JSON.stringify({
@@ -196,6 +211,7 @@ answer:answer
 });
 
 /* 1.5초 후 초기화 */
+
 setTimeout(()=>{
 
 location.reload();
