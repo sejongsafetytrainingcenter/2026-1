@@ -8,9 +8,9 @@
 
 body{
 font-family:"Noto Sans KR",sans-serif;
-background:linear-gradient(135deg,#fff7cc,#fffdf7);
+background:#fffdf7;
 text-align:center;
-padding:40px;
+padding:20px;
 margin:0;
 }
 
@@ -25,80 +25,62 @@ margin-bottom:40px;
 /* 그룹 질문 */
 
 #group h2{
-font-size:48px;
+font-size:50px;
 margin-bottom:40px;
-color:#444;
 }
 
-/* 그룹 버튼 공통 */
+/* 그룹 버튼 */
 
-#group button{
-font-size:38px;
+.groupBtn{
+font-size:40px;
 padding:30px 60px;
-margin:25px;
+margin:30px;
 border:none;
-border-radius:25px;
+border-radius:20px;
 cursor:pointer;
-box-shadow:0 10px 20px rgba(0,0,0,0.15);
-transition:0.2s;
+font-weight:bold;
+}
+
+/* 유치원 */
+
+.kinder{
+background:#ffd54f;
 color:black;
 }
 
-/* 유치원 / 어린이집 */
-
-.kinder{
-background:#ffa726;
-}
-
-/* 초등학교 저학년 */
+/* 초등 */
 
 .elementary{
-background:#90caf9;
+background:#42a5f5;
+color:black;
 }
 
-#group button:hover{
-transform:scale(1.05);
-}
-
-/* 질문 박스 */
+/* 질문 */
 
 .question{
-font-size:48px;
-margin-top:60px;
-line-height:1.5;
-background:#fff3cd;
-padding:40px;
-border-radius:30px;
-box-shadow:0 10px 25px rgba(0,0,0,0.1);
-display:inline-block;
+font-size:50px;
+margin-top:40px;
+line-height:1.4;
 }
 
-/* 답변 버튼 영역 */
+/* 응답 버튼 */
 
 .answers{
-margin-top:50px;
+margin-top:60px;
 }
 
-/* 답변 버튼 */
-
 .answers button{
-width:240px;
-height:240px;
+width:220px;
+height:220px;
 font-size:90px;
 border-radius:50%;
 border:none;
-margin:35px;
+margin:30px;
 color:white;
 cursor:pointer;
-box-shadow:0 10px 25px rgba(0,0,0,0.25);
-transition:0.2s;
 }
 
-.answers button:hover{
-transform:scale(1.1);
-}
-
-/* 버튼 색상 */
+/* 색 */
 
 .green{background:#66bb6a;}
 .yellow{background:#ffee58;color:black;}
@@ -118,9 +100,8 @@ justify-content:center;
 align-items:center;
 font-size:70px;
 font-weight:bold;
-color:#333;
 display:none;
-z-index:9999;
+z-index:999;
 }
 
 </style>
@@ -139,11 +120,11 @@ z-index:9999;
 
 <h2>나는 어떤 친구일까요?</h2>
 
-<button class="kinder" onclick="selectGroup('유아')">
+<button class="groupBtn kinder" onclick="selectGroup('유아')">
 유치원 / 어린이집
 </button>
 
-<button class="elementary" onclick="selectGroup('초등')">
+<button class="groupBtn elementary" onclick="selectGroup('초등')">
 초등학교 저학년
 </button>
 
@@ -192,39 +173,38 @@ if(lock) return;
 
 lock=true;
 
+/* 날짜 생성 (연월일만) */
+
+const today = new Date().toISOString().split("T")[0];
+
+/* 버튼 숨기기 */
+
+document.getElementById("survey").style.display="none";
+
 /* 감사 화면 표시 */
 
 document.getElementById("thanks").style.display="flex";
 
-/* 버튼 비활성화 */
+/* 모든 버튼 비활성화 */
 
 document.querySelectorAll("button").forEach(b=>b.disabled=true);
 
-/* 구글 시트로 데이터 전송 */
+/* 구글 시트 전송 */
 
 fetch(sheetURL,{
 method:"POST",
 body:JSON.stringify({
+date:today,
 group:group,
 answer:answer
 })
 });
 
-/* 1.5초 후 설문 초기화 */
+/* 1.5초 후 초기화 */
 
 setTimeout(()=>{
 
-document.getElementById("thanks").style.display="none";
-
-document.getElementById("survey").style.display="none";
-
-document.getElementById("group").style.display="block";
-
-/* 버튼 다시 활성화 */
-
-document.querySelectorAll("button").forEach(b=>b.disabled=false);
-
-lock=false;
+location.reload();
 
 },1500);
 
