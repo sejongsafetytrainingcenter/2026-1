@@ -41,19 +41,19 @@ border-radius:25px;
 cursor:pointer;
 box-shadow:0 10px 20px rgba(0,0,0,0.15);
 transition:0.2s;
-color:white;
+color:black;
 }
 
-/* 유아 버튼 (기존색 유지) */
+/* 유치원 / 어린이집 */
 
 .kinder{
 background:#ffa726;
 }
 
-/* 초등 버튼 (새 색) */
+/* 초등학교 저학년 */
 
 .elementary{
-background:#42a5f5;
+background:#90caf9;
 }
 
 #group button:hover{
@@ -192,11 +192,11 @@ if(lock) return;
 
 lock=true;
 
-/* 감사 화면 먼저 표시 (버튼 가리기) */
+/* 감사 화면 표시 */
 
 document.getElementById("thanks").style.display="flex";
 
-/* 모든 버튼 비활성화 */
+/* 버튼 비활성화 */
 
 document.querySelectorAll("button").forEach(b=>b.disabled=true);
 
@@ -210,11 +210,21 @@ answer:answer
 })
 });
 
-/* 1.5초 후 초기화 */
+/* 1.5초 후 설문 초기화 */
 
 setTimeout(()=>{
 
-location.reload();
+document.getElementById("thanks").style.display="none";
+
+document.getElementById("survey").style.display="none";
+
+document.getElementById("group").style.display="block";
+
+/* 버튼 다시 활성화 */
+
+document.querySelectorAll("button").forEach(b=>b.disabled=false);
+
+lock=false;
 
 },1500);
 
