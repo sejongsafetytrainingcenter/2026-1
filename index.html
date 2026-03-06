@@ -92,7 +92,7 @@
       padding: 10px;
       background-color: #fff3e0;
     }
-    .hide-stats-btn, .cancel-btn {
+    .stats-btn, .cancel-btn {
       margin-top: 20px;
       font-size: 1em;
       padding: 10px 18px;
@@ -103,7 +103,7 @@
       background-color: #64b5f6;
       transition: transform 0.3s;
     }
-    .hide-stats-btn:hover, .cancel-btn:hover {
+    .stats-btn:hover, .cancel-btn:hover {
       transform: scale(1.1);
     }
     .overlay {
@@ -133,7 +133,7 @@
 <body>
   <div class="overlay" id="overlay">응답이 완료되었습니다</div>
   <header>
-    <img src="https://www.sejong.go.kr/assets/images/logo_sejong.png" alt="세종시 안전체험교육원 로고">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/Sejong_City_Office_of_Education_Symbol.svg" alt="세종특별자치시교육청 로고">
     <h1>안전체험교육 설문조사</h1>
     <div class="date">오늘: <span id="date"></span> (<span id="weekday"></span>)</div>
   </header>
@@ -154,7 +154,7 @@
     <button class="cancel-btn" onclick="cancelAnswer()">응답 취소</button>
   </div>
 
-  <button class="hide-stats-btn" onclick="requestPassword()">통계 보기</button>
+  <button class="stats-btn" onclick="requestPassword()">월별 통계</button>
 
   <div class="stats" id="statsTable" style="display:none;">
     <h2>통계 - <span id="selectedGroup"></span></h2>
