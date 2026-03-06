@@ -17,10 +17,11 @@ h1 {color:#ff6f00;font-size:2em;}
 .green {background-color:#81c784;}
 .yellow {background-color:#fff176;color:#333;}
 .red {background-color:#e57373;}
-.overlay {position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.95);z-index:9999;display:flex;align-items:center;justify-content:center;font-size:3em;color:#333;font-weight:bold;display:none;}
+.overlay {position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255, 255, 255, 0.95);z-index:9999;display:flex;align-items:center;justify-content:center;font-size:3em;color:#333;font-weight:bold;display:none;}
 </style>
 </head>
 <body>
+
 <div class="overlay" id="overlay">응답이 완료되었습니다!</div>
 
 <header>
@@ -45,7 +46,9 @@ h1 {color:#ff6f00;font-size:2em;}
 </div>
 
 <script>
-const sheetURL = "https://script.google.com/macros/s/AKfycbyAFaas4NbjMBtqJV8jYiDcI30IJef6nxr7PMtJ3uof0nxQOLvuAkSlzeyztLBMdeJw/exec";
+// 새 Apps Script 웹앱 URL
+const sheetURL = "https://script.google.com/macros/s/AKfycbxPiyStrs2EvqOcgJ9hz5vMMv1Zf12sDtDCw-XVY3q/exec";
+
 const now = new Date();
 const kst = new Date(now.getTime()+9*60*60*1000);
 const today = kst.toISOString().slice(0,10);
@@ -65,7 +68,12 @@ function selectGroup(group){
 function showOverlay(){
   const overlay = document.getElementById("overlay");
   overlay.style.display="flex";
-  setTimeout(()=>{overlay.style.display="none"; document.getElementById("questionSection").style.display="none"; document.getElementById("groupButtons").style.display="block"; locked=false;},2000);
+  setTimeout(()=>{
+    overlay.style.display="none";
+    document.getElementById("questionSection").style.display="none";
+    document.getElementById("groupButtons").style.display="block";
+    locked=false;
+  },2000); // 2초 후 초기 화면
 }
 
 function submitAnswer(answer){
@@ -80,11 +88,10 @@ function submitAnswer(answer){
     body: JSON.stringify({date:today,time:timestamp,group:selectedGroup,answer:answer})
   })
   .then(res=>res.text())
-  .then(()=>{
-    showOverlay();
-  })
+  .then(()=>{showOverlay();})
   .catch(err=>{console.error(err); alert("데이터 전송 실패!"); locked=false;});
 }
 </script>
+
 </body>
 </html>
