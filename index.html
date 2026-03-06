@@ -114,27 +114,50 @@ display:none;
 margin-top:40px;
 }
 
-table{
-border-collapse:collapse;
-margin:30px auto;
-font-size:26px;
+.statsGroup{
+display:flex;
+justify-content:center;
+align-items:center;
+margin:20px 0;
+flex-wrap:wrap;
 }
 
-th,td{
-border:1px solid #999;
-padding:15px 30px;
+.statsGroup .statBtn{
+width:120px;
+height:120px;
+border-radius:50%;
+border:none;
+margin:10px;
+font-size:36px;
+color:white;
+cursor:default;
+box-shadow:0 6px 15px rgba(0,0,0,0.2);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
 }
 
-th{
-background:#f5f5f5;
+.statTitle{
+font-size:22px;
+margin-bottom:5px;
+font-weight:bold;
 }
+
+.statValue{
+font-size:28px;
+font-weight:bold;
+}
+
+.statO{background:#66bb6a;}
+.statD{background:#ffee58;color:black;}
+.statX{background:#ef5350;}
 
 .sectionTitle{
 font-size:36px;
 margin-top:40px;
 font-weight:bold;
 }
-
 </style>
 </head>
 
@@ -183,131 +206,93 @@ font-weight:bold;
 <div id="statsBox">
 
 <div class="sectionTitle">📅 오늘 응답</div>
-
-<table>
-<tr>
-<th></th>
-<th>O</th>
-<th>△</th>
-<th>X</th>
-</tr>
-<tr>
-<th>유아</th>
-<td id="todayKidO">0</td>
-<td id="todayKidD">0</td>
-<td id="todayKidX">0</td>
-</tr>
-<tr>
-<th>초등</th>
-<td id="todayEleO">0</td>
-<td id="todayEleD">0</td>
-<td id="todayEleX">0</td>
-</tr>
-</table>
+<div id="todayStats" class="statsGroup"></div>
 
 <div class="sectionTitle">📆 이번달 응답</div>
-
-<table>
-<tr>
-<th></th>
-<th>O</th>
-<th>△</th>
-<th>X</th>
-</tr>
-<tr>
-<th>유아</th>
-<td id="monthKidO">0</td>
-<td id="monthKidD">0</td>
-<td id="monthKidX">0</td>
-</tr>
-<tr>
-<th>초등</th>
-<td id="monthEleO">0</td>
-<td id="monthEleD">0</td>
-<td id="monthEleX">0</td>
-</tr>
-</table>
+<div id="monthStats" class="statsGroup"></div>
 
 </div>
 
 <script>
-
 const sheetURL = "https://script.google.com/macros/s/AKfycbyQN6TFE-hy5vXfA5swgboET8HRrf-ZpiWomqIIGuHoO4Yh7UYHAIntB3Ok-Zo4YX_f/exec";
 
 let group = "";
 let lock = false;
 
-// 그룹 버튼 클릭 처리
-document.querySelectorAll(".groupBtn").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-        group = btn.dataset.group;
-        document.getElementById("group").style.display="none";
-        document.getElementById("survey").style.display="block";
-    });
+document.addEventListener("DOMContentLoaded", function(){
+
+  // 그룹 버튼 클릭
+  document.querySelectorAll(".groupBtn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+          group = btn.dataset.group;
+          document.getElementById("group").style.display="none";
+          document.getElementById("survey").style.display="block";
+      });
+  });
+
+  // 답변 버튼 클릭
+  document.querySelectorAll(".answers button").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+          if(lock) return;
+          lock=true;
+          document.querySelector(".answers").style.display="none";
+          document.getElementById("thanks").style.display="flex";
+
+          fetch(sheetURL,{
+              method:"POST",
+              body:JSON.stringify({
+                  group:group,
+                  answer:btn.dataset.answer
+              })
+          });
+
+          setTimeout(()=>{ location.reload(); },1500);
+      });
+  });
+
+  // 관리자 통계
+  document.getElementById("statsBtn").addEventListener("click", ()=>{
+      const pwd = prompt("관리자 비밀번호 입력");
+      if(pwd !== "0705"){ alert("비밀번호 틀림"); return; }
+
+      fetch(sheetURL)
+      .then(res=>res.json())
+      .then(data=>{
+          const today = new Date().toISOString().slice(0,10);
+          const month = today.slice(0,7);
+
+          let stats = {
+              today:{유아:{O:0,△:0,X:0}, 초등:{O:0,△:0,X:0}},
+              month:{유아:{O:0,△:0,X:0}, 초등:{O:0,△:0,X:0}}
+          };
+
+          data.slice(1).forEach(row=>{
+              const date=row[0], g=row[1], ans=row[2];
+              if(date===today) stats.today[g][ans]++;
+              if(date.startsWith(month)) stats.month[g][ans]++;
+          });
+
+          // 버튼 형태로 표시 함수
+          function renderStats(containerId, statsObj){
+              const container = document.getElementById(containerId);
+              container.innerHTML="";
+              ["유아","초등"].forEach(g=>{
+                  ["O","△","X"].forEach(a=>{
+                      const btn = document.createElement("button");
+                      btn.className = "statBtn "+(a==="O"?"statO":a==="△"?"statD":"statX");
+                      btn.innerHTML = `<div class="statTitle">${g} ${a}</div><div class="statValue">${statsObj[g][a]}</div>`;
+                      container.appendChild(btn);
+                  });
+              });
+          }
+
+          renderStats("todayStats", stats.today);
+          renderStats("monthStats", stats.month);
+          document.getElementById("statsBox").style.display="block";
+      });
+  });
+
 });
-
-// 답변 버튼 클릭 처리
-document.querySelectorAll(".answers button").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-        if(lock) return;
-        lock=true;
-        document.querySelector(".answers").style.display="none";
-        document.getElementById("thanks").style.display="flex";
-
-        fetch(sheetURL,{
-            method:"POST",
-            body:JSON.stringify({
-                group:group,
-                answer:btn.dataset.answer
-            })
-        });
-
-        setTimeout(()=>{ location.reload(); },1500);
-    });
-});
-
-// 관리자 통계
-document.getElementById("statsBtn").addEventListener("click", ()=>{
-    const pwd=prompt("관리자 비밀번호 입력");
-    if(pwd!=="0705"){ alert("비밀번호 틀림"); return; }
-
-    fetch(sheetURL)
-    .then(res=>res.json())
-    .then(data=>{
-        const today=new Date().toISOString().slice(0,10);
-        const month=today.slice(0,7);
-
-        let stats={
-            today:{유아:{O:0,△:0,X:0}, 초등:{O:0,△:0,X:0}},
-            month:{유아:{O:0,△:0,X:0}, 초등:{O:0,△:0,X:0}}
-        };
-
-        data.slice(1).forEach(row=>{
-            const date=row[0], g=row[1], ans=row[2];
-            if(date===today) stats.today[g][ans]++;
-            if(date.startsWith(month)) stats.month[g][ans]++;
-        });
-
-        document.getElementById("todayKidO").textContent=stats.today.유아.O;
-        document.getElementById("todayKidD").textContent=stats.today.유아.△;
-        document.getElementById("todayKidX").textContent=stats.today.유아.X;
-
-        document.getElementById("todayEleO").textContent=stats.today.초등.O;
-        document.getElementById("todayEleD").textContent=stats.today.초등.△;
-        document.getElementById("todayEleX").textContent=stats.today.초등.X;
-
-        document.getElementById("monthKidO").textContent=stats.month.유아.O;
-        document.getElementById("monthKidD").textContent=stats.month.유아.△;
-        document.getElementById("monthKidX").textContent=stats.month.유아.X;
-
-        document.getElementById("monthEleO").textContent=stats.month.초등.O;
-        document.getElementById("monthEleD").textContent=stats.month.초등.△;
-        document.getElementById("monthEleX").textContent=stats.month.초등.X;
-
-        document.getElementById("statsBox").style.display="block";
-    });
-});
-
 </script>
 
 </body>
