@@ -5,216 +5,194 @@
 <title>세종시안전체험교육원 만족도 조사</title>
 
 <style>
-
 body{
-font-family:"Noto Sans KR",sans-serif;
-background:linear-gradient(180deg,#fffdf7,#fff3cd);
-text-align:center;
-padding:20px;
-margin:0;
+  font-family:"Noto Sans KR",sans-serif;
+  background:linear-gradient(180deg,#fffdf7,#fff3cd);
+  text-align:center;
+  padding:20px;
+  margin:0;
 }
 
 h1{
-color:#ff6f00;
-font-size:48px;
-margin-bottom:20px;
+  color:#ff6f00;
+  font-size:48px;
+  margin-bottom:20px;
 }
 
 #groupTitle{
-font-size:42px;
-margin-bottom:30px;
-font-weight:bold;
+  font-size:42px;
+  margin-bottom:30px;
+  font-weight:bold;
 }
 
 .groupBtn{
-font-size:34px;
-padding:30px 50px;
-margin:25px;
-border:none;
-border-radius:25px;
-cursor:pointer;
-box-shadow:0 8px 20px rgba(0,0,0,0.2);
+  font-size:34px;
+  padding:30px 50px;
+  margin:25px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
 .kindergarten{
-background:#ffd54f;
-color:black;
+  background:#ffd54f;
+  color:black;
 }
 
 .elementary{
-background:#4caf50;
-color:black;
+  background:#4caf50;
+  color:black;
 }
 
 .question{
-font-size:46px;
-margin-top:60px;
-line-height:1.4;
-font-weight:bold;
+  font-size:46px;
+  margin-top:60px;
+  line-height:1.4;
+  font-weight:bold;
 }
 
 .answers{
-margin-top:70px;
+  margin-top:70px;
 }
 
 .answers button{
-width:200px;
-height:200px;
-font-size:70px;
-border-radius:50%;
-border:none;
-margin:35px;
-color:white;
-cursor:pointer;
-box-shadow:0 10px 25px rgba(0,0,0,0.3);
+  width:200px;
+  height:200px;
+  font-size:70px;
+  border-radius:50%;
+  border:none;
+  margin:35px;
+  color:white;
+  cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
 .green{background:#66bb6a;}
 .yellow{background:#ffee58;color:black;}
 .red{background:#ef5350;}
 
+/* 감사 화면 */
 #thanks{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:white;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:60px;
-font-weight:bold;
-display:none;
-z-index:999;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:white;
+  display:none; /* 처음에는 숨김 */
+  justify-content:center;
+  align-items:center;
+  font-size:60px;
+  font-weight:bold;
+  z-index:999;
 }
 
 /* 통계 스타일 */
-
 #statsBox{
-display:none;
-margin-top:40px;
+  display:none;
+  margin-top:40px;
 }
 
 table{
-border-collapse:collapse;
-margin:auto;
-font-size:26px;
+  border-collapse:collapse;
+  margin:auto;
+  font-size:26px;
 }
 
 th,td{
-border:1px solid #aaa;
-padding:12px 20px;
+  border:1px solid #aaa;
+  padding:12px 20px;
 }
 
 th{
-background:#ffe082;
+  background:#ffe082;
 }
 
 #statsBtn{
-font-size:20px;
-padding:10px 20px;
-border:none;
-border-radius:10px;
-background:#64b5f6;
-color:white;
-cursor:pointer;
-margin-bottom:30px;
+  font-size:20px;
+  padding:10px 20px;
+  border:none;
+  border-radius:10px;
+  background:#64b5f6;
+  color:white;
+  cursor:pointer;
+  margin-bottom:30px;
 }
-
 </style>
 </head>
 
 <body>
-
-<div id="thanks">
-응답 감사합니다!
-</div>
 
 <h1>안전체험교육 만족도 조사</h1>
 
 <button id="statsBtn" onclick="showStats()">월별 통계</button>
 
 <div id="group">
+  <div id="groupTitle">
+    나는 어떤 친구일까요?
+  </div>
 
-<div id="groupTitle">
-나는 어떤 친구일까요?
-</div>
+  <button class="groupBtn kindergarten" onclick="selectGroup('유아')">
+    유치원 / 어린이집
+  </button>
 
-<button class="groupBtn kindergarten" onclick="selectGroup('유아')">
-유치원 / 어린이집
-</button>
-
-<button class="groupBtn elementary" onclick="selectGroup('초등')">
-초등학교 저학년
-</button>
-
+  <button class="groupBtn elementary" onclick="selectGroup('초등')">
+    초등학교 저학년
+  </button>
 </div>
 
 <div id="survey" style="display:none">
+  <div class="question">
+    교육을 통해 위험한 상황에서<br>
+    어떻게 행동해야 하는지<br>
+    잘 알게 되었나요?
+  </div>
 
-<div class="question">
-
-교육을 통해 위험한 상황에서<br>
-어떻게 행동해야 하는지<br>
-잘 알게 되었나요?
-
-</div>
-
-<div class="answers">
-
-<button class="green" onclick="send('O')">O</button>
-<button class="yellow" onclick="send('△')">△</button>
-<button class="red" onclick="send('X')">X</button>
-
-</div>
-
+  <div class="answers">
+    <button class="green" onclick="send('O')">O</button>
+    <button class="yellow" onclick="send('△')">△</button>
+    <button class="red" onclick="send('X')">X</button>
+  </div>
 </div>
 
 <div id="statsBox">
+  <h2>월별 통계</h2>
+  <table>
+    <tr>
+      <th>응답</th>
+      <th>개수</th>
+      <th>비율</th>
+    </tr>
+    <tr>
+      <td>O</td>
+      <td id="oCount">0</td>
+      <td id="oRate">0%</td>
+    </tr>
+    <tr>
+      <td>△</td>
+      <td id="dCount">0</td>
+      <td id="dRate">0%</td>
+    </tr>
+    <tr>
+      <td>X</td>
+      <td id="xCount">0</td>
+      <td id="xRate">0%</td>
+    </tr>
+    <tr>
+      <th>총합</th>
+      <th id="totalCount">0</th>
+      <th>100%</th>
+    </tr>
+  </table>
+</div>
 
-<h2>월별 통계</h2>
-
-<table>
-
-<tr>
-<th>응답</th>
-<th>개수</th>
-<th>비율</th>
-</tr>
-
-<tr>
-<td>O</td>
-<td id="oCount">0</td>
-<td id="oRate">0%</td>
-</tr>
-
-<tr>
-<td>△</td>
-<td id="dCount">0</td>
-<td id="dRate">0%</td>
-</tr>
-
-<tr>
-<td>X</td>
-<td id="xCount">0</td>
-<td id="xRate">0%</td>
-</tr>
-
-<tr>
-<th>총합</th>
-<th id="totalCount">0</th>
-<th>100%</th>
-</tr>
-
-</table>
-
+<!-- 감사 화면은 맨 아래에 배치 -->
+<div id="thanks">
+  응답 감사합니다!
 </div>
 
 <script>
-
-/* Apps Script 주소 */
-
 const sheetURL =
 "https://script.google.com/macros/s/AKfycbyQN6TFE-hy5vXfA5swgboET8HRrf-ZpiWomqIIGuHoO4Yh7UYHAIntB3Ok-Zo4YX_f/exec";
 
@@ -222,106 +200,73 @@ let group="";
 let lock=false;
 
 function selectGroup(g){
-
-group=g;
-
-document.getElementById("group").style.display="none";
-document.getElementById("survey").style.display="block";
-
+  group=g;
+  document.getElementById("group").style.display="none";
+  document.getElementById("survey").style.display="block";
 }
 
 function send(answer){
+  if(lock) return;
+  lock=true;
 
-if(lock) return;
+  // 버튼 숨김
+  document.querySelector(".answers").style.display="none";
 
-lock=true;
+  // 감사 화면
+  document.getElementById("thanks").style.display="flex";
 
-/* 버튼 숨김 */
+  // 시트 전송
+  fetch(sheetURL,{
+    method:"POST",
+    body:JSON.stringify({
+      group:group,
+      answer:answer
+    })
+  });
 
-document.querySelector(".answers").style.display="none";
-
-/* 감사 화면 */
-
-document.getElementById("thanks").style.display="flex";
-
-/* 시트 전송 */
-
-fetch(sheetURL,{
-method:"POST",
-body:JSON.stringify({
-group:group,
-answer:answer
-})
-});
-
-/* 초기화 */
-
-setTimeout(()=>{
-location.reload();
-},1500);
-
+  // 초기화
+  setTimeout(()=>{
+    location.reload();
+  },1500);
 }
 
-/* 월별 통계 */
-
+// 월별 통계
 function showStats(){
+  const pwd = prompt("관리자 비밀번호 입력");
+  if(pwd !== "0705"){
+    alert("비밀번호가 틀렸습니다.");
+    return;
+  }
 
-const pwd = prompt("관리자 비밀번호 입력");
+  fetch(sheetURL)
+  .then(res=>res.json())
+  .then(data=>{
+    let O=0, D=0, X=0;
+    const today = new Date();
+    const monthKey = today.toISOString().slice(0,7);
 
-if(pwd !== "0705"){
-alert("비밀번호가 틀렸습니다.");
-return;
+    data.slice(1).forEach(row=>{
+      const date = row[0];
+      const answer = row[2];
+      if(String(date).startsWith(monthKey)){
+        if(answer==="O") O++;
+        if(answer==="△") D++;
+        if(answer==="X") X++;
+      }
+    });
+
+    const total = O + D + X;
+    document.getElementById("oCount").textContent = O;
+    document.getElementById("dCount").textContent = D;
+    document.getElementById("xCount").textContent = X;
+    document.getElementById("oRate").textContent = total ? (O/total*100).toFixed(1)+"%" : "0%";
+    document.getElementById("dRate").textContent = total ? (D/total*100).toFixed(1)+"%" : "0%";
+    document.getElementById("xRate").textContent = total ? (X/total*100).toFixed(1)+"%" : "0%";
+    document.getElementById("totalCount").textContent = total;
+
+    document.getElementById("statsBox").style.display="block";
+  });
 }
-
-fetch(sheetURL)
-.then(res=>res.json())
-.then(data=>{
-
-let O=0;
-let D=0;
-let X=0;
-
-const today = new Date();
-const monthKey = today.toISOString().slice(0,7);
-
-data.slice(1).forEach(row=>{
-
-const date = row[0];
-const answer = row[2];
-
-if(String(date).startsWith(monthKey)){
-
-if(answer==="O") O++;
-if(answer==="△") D++;
-if(answer==="X") X++;
-
-}
-
-});
-
-const total = O + D + X;
-
-document.getElementById("oCount").textContent = O;
-document.getElementById("dCount").textContent = D;
-document.getElementById("xCount").textContent = X;
-
-document.getElementById("oRate").textContent =
-total ? (O/total*100).toFixed(1)+"%" : "0%";
-
-document.getElementById("dRate").textContent =
-total ? (D/total*100).toFixed(1)+"%" : "0%";
-
-document.getElementById("xRate").textContent =
-total ? (X/total*100).toFixed(1)+"%" : "0%";
-
-document.getElementById("totalCount").textContent = total;
-
-document.getElementById("statsBox").style.display="block";
-
-});
-
-}
-
 </script>
 
 </body>
