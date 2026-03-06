@@ -128,7 +128,6 @@
       from {opacity: 0;}
       to {opacity: 1;}
     }
-    /* 통계 상단 글씨 숨기기 */
     #statsTable h2 { display: none; }
   </style>
 </head>
@@ -223,8 +222,13 @@ function updateCountsFromSheet() {
       const rows = data.slice(1);
       const monthly = {"O": 0, "△": 0, "X": 0};
       rows.forEach(row => {
-        const [date, group, answer] = row;
-        if(group === selectedGroup && date.startsWith(monthKey)) monthly[answer]++;
+        // 시트 구조: [date, time, group, answer]
+        const date = row[0];
+        const group = row[2];
+        const answer = row[3];
+        if(group === selectedGroup && ["O","△","X"].includes(answer)) {
+          if(date.startsWith(monthKey)) monthly[answer]++;
+        }
       });
       drawStatsTable(monthly);
     })
