@@ -20,6 +20,17 @@ font-size:48px;
 margin-bottom:20px;
 }
 
+#statsBtn{
+font-size:20px;
+padding:10px 20px;
+border:none;
+border-radius:10px;
+background:#64b5f6;
+color:white;
+cursor:pointer;
+margin-bottom:30px;
+}
+
 #groupTitle{
 font-size:42px;
 margin-bottom:30px;
@@ -89,8 +100,6 @@ display:none;
 z-index:999;
 }
 
-/* 통계 스타일 */
-
 #statsBox{
 display:none;
 margin-top:40px;
@@ -99,27 +108,22 @@ margin-top:40px;
 table{
 border-collapse:collapse;
 margin:auto;
-font-size:26px;
+font-size:22px;
 }
 
 th,td{
-border:1px solid #aaa;
-padding:12px 20px;
+border:1px solid #999;
+padding:10px 20px;
 }
 
 th{
-background:#ffe082;
+background:#f2f2f2;
 }
 
-#statsBtn{
-font-size:20px;
-padding:10px 20px;
-border:none;
-border-radius:10px;
-background:#64b5f6;
-color:white;
-cursor:pointer;
-margin-bottom:30px;
+.bar{
+height:30px;
+background:#4caf50;
+margin:5px 0;
 }
 
 </style>
@@ -133,7 +137,7 @@ margin-bottom:30px;
 
 <h1>안전체험교육 만족도 조사</h1>
 
-<button id="statsBtn" onclick="showStats()">월별 통계</button>
+<button id="statsBtn" onclick="showStats()">📊 관리자 통계</button>
 
 <div id="group">
 
@@ -173,47 +177,51 @@ margin-bottom:30px;
 
 <div id="statsBox">
 
-<h2>월별 통계</h2>
+<h2>📊 관리자 통계</h2>
 
 <table>
 
 <tr>
-<th>응답</th>
-<th>개수</th>
-<th>비율</th>
+<th>구분</th>
+<th>응답수</th>
 </tr>
 
 <tr>
-<td>O</td>
-<td id="oCount">0</td>
-<td id="oRate">0%</td>
+<td>오늘 응답</td>
+<td id="todayCount">0</td>
 </tr>
 
 <tr>
-<td>△</td>
-<td id="dCount">0</td>
-<td id="dRate">0%</td>
+<td>이번달 응답</td>
+<td id="monthCount">0</td>
 </tr>
 
 <tr>
-<td>X</td>
-<td id="xCount">0</td>
-<td id="xRate">0%</td>
+<td>유아</td>
+<td id="kidCount">0</td>
 </tr>
 
 <tr>
-<th>총합</th>
-<th id="totalCount">0</th>
-<th>100%</th>
+<td>초등</td>
+<td id="eleCount">0</td>
 </tr>
 
 </table>
 
+<h3 style="margin-top:40px">응답 비율</h3>
+
+<div>O</div>
+<div id="barO" class="bar"></div>
+
+<div>△</div>
+<div id="barD" class="bar" style="background:#ffee58"></div>
+
+<div>X</div>
+<div id="barX" class="bar" style="background:#ef5350"></div>
+
 </div>
 
 <script>
-
-/* Apps Script 주소 */
 
 const sheetURL =
 "https://script.google.com/macros/s/AKfycbyQN6TFE-hy5vXfA5swgboET8HRrf-ZpiWomqIIGuHoO4Yh7UYHAIntB3Ok-Zo4YX_f/exec";
@@ -236,15 +244,9 @@ if(lock) return;
 
 lock=true;
 
-/* 버튼 숨김 */
-
 document.querySelector(".answers").style.display="none";
 
-/* 감사 화면 */
-
 document.getElementById("thanks").style.display="flex";
-
-/* 시트 전송 */
 
 fetch(sheetURL,{
 method:"POST",
@@ -254,22 +256,20 @@ answer:answer
 })
 });
 
-/* 초기화 */
-
 setTimeout(()=>{
+
 location.reload();
+
 },1500);
 
 }
 
-/* 월별 통계 */
-
 function showStats(){
 
-const pwd = prompt("관리자 비밀번호 입력");
+const pwd=prompt("관리자 비밀번호 입력");
 
-if(pwd !== "0705"){
-alert("비밀번호가 틀렸습니다.");
+if(pwd!=="0705"){
+alert("비밀번호 틀림");
 return;
 }
 
@@ -277,44 +277,50 @@ fetch(sheetURL)
 .then(res=>res.json())
 .then(data=>{
 
+const today=new Date().toISOString().slice(0,10);
+const month=today.slice(0,7);
+
+let todayCount=0;
+let monthCount=0;
+let kid=0;
+let ele=0;
+
 let O=0;
 let D=0;
 let X=0;
 
-const today = new Date();
-const monthKey = today.toISOString().slice(0,7);
-
 data.slice(1).forEach(row=>{
 
-const date = row[0];
-const answer = row[2];
+const date=row[0];
+const group=row[1];
+const answer=row[2];
 
-if(String(date).startsWith(monthKey)){
+if(date===today) todayCount++;
+
+if(date.startsWith(month)) monthCount++;
+
+if(group==="유아") kid++;
+
+if(group==="초등") ele++;
 
 if(answer==="O") O++;
-if(answer==="△") D++;
-if(answer==="X") X++;
 
-}
+if(answer==="△") D++;
+
+if(answer==="X") X++;
 
 });
 
-const total = O + D + X;
+document.getElementById("todayCount").textContent=todayCount;
+document.getElementById("monthCount").textContent=monthCount;
+document.getElementById("kidCount").textContent=kid;
+document.getElementById("eleCount").textContent=ele;
 
-document.getElementById("oCount").textContent = O;
-document.getElementById("dCount").textContent = D;
-document.getElementById("xCount").textContent = X;
+const total=O+D+X||1;
 
-document.getElementById("oRate").textContent =
-total ? (O/total*100).toFixed(1)+"%" : "0%";
-
-document.getElementById("dRate").textContent =
-total ? (D/total*100).toFixed(1)+"%" : "0%";
-
-document.getElementById("xRate").textContent =
-total ? (X/total*100).toFixed(1)+"%" : "0%";
-
-document.getElementById("totalCount").textContent = total;
+document.getElementById("barO").style.width=(O/total*100)+"%";
+document.getElementById("barD").style.width=(D/total*100)+"%";
+document.getElementById("barX").style.width=(X/total*100)+"%";
 
 document.getElementById("statsBox").style.display="block";
 
