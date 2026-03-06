@@ -72,9 +72,8 @@ h1{
 .yellow{background:#ffee58;color:black;}
 .red{background:#ef5350;}
 
-/* 감사 화면 */
 #thanks{
-  display:none; /* 처음에는 숨김 */
+  display:none;
   position:fixed;
   top:0;
   left:0;
@@ -88,7 +87,6 @@ h1{
   z-index:999;
 }
 
-/* 통계 스타일 */
 #statsBox{
   display:none;
   margin-top:40px;
@@ -187,7 +185,6 @@ th{
   </table>
 </div>
 
-<!-- 감사 화면 맨 아래 배치 -->
 <div id="thanks">응답 감사합니다!</div>
 
 <script>
@@ -200,35 +197,35 @@ let lock=false;
 function selectGroup(g){
   group=g;
   document.getElementById("group").style.display="none";
-  document.getElementById("survey").style.display="block"; // 설문 화면 표시
+  document.getElementById("survey").style.display="block";
 }
 
 function send(answer){
   if(lock) return;
   lock=true;
 
-  // 버튼 숨김
+  // 1️⃣ 버튼 숨기고 감사 화면 바로 표시
   document.querySelector(".answers").style.display="none";
-
-  // 감사 화면 표시
   document.getElementById("thanks").style.display="flex";
 
-  // 시트 전송
-  fetch(sheetURL,{
-    method:"POST",
-    body:JSON.stringify({
-      group:group,
-      answer:answer
-    })
-  });
+  // 2️⃣ 서버 전송 비동기 처리
+  setTimeout(()=> {
+    fetch(sheetURL,{
+      method:"POST",
+      body:JSON.stringify({
+        group:group,
+        answer:answer
+      })
+    });
+  }, 0);
 
-  // 1.5초 뒤 초기 화면으로 돌아가기
+  // 3️⃣ 1초 후 초기 화면으로
   setTimeout(()=>{
     document.getElementById("thanks").style.display="none";
     document.getElementById("survey").style.display="none";
     document.getElementById("group").style.display="block";
-    lock=false; // 다음 응답 가능
-  }, 1500);
+    lock=false;
+  }, 1000);
 }
 
 // 월별 통계
