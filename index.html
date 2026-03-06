@@ -2,43 +2,75 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>세종시안전체험교육원 설문</title>
+<title>세종시안전체험교육원 만족도 조사</title>
 
 <style>
 
 body{
-font-family:sans-serif;
-text-align:center;
+font-family:"Noto Sans KR",sans-serif;
 background:#fffdf7;
-padding:20px;
+text-align:center;
+padding:30px;
+margin:0;
 }
 
 h1{
 color:#ff6f00;
+font-size:40px;
 }
 
 .group button{
-font-size:20px;
-padding:15px 25px;
-margin:10px;
-border-radius:10px;
+
+font-size:28px;
+padding:20px 40px;
+margin:20px;
 border:none;
+border-radius:15px;
 background:#ffd54f;
+cursor:pointer;
+
 }
 
-.answer button{
-width:150px;
-height:150px;
+.question{
+
 font-size:40px;
-margin:20px;
+margin-top:50px;
+
+}
+
+.answers button{
+
+width:180px;
+height:180px;
+font-size:60px;
 border-radius:50%;
 border:none;
+margin:30px;
 color:white;
+cursor:pointer;
+
 }
 
 .green{background:#66bb6a;}
 .yellow{background:#ffee58;color:black;}
 .red{background:#ef5350;}
+
+#thanks{
+
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:50px;
+font-weight:bold;
+display:none;
+
+}
 
 </style>
 
@@ -46,11 +78,15 @@ color:white;
 
 <body>
 
+<div id="thanks">
+응답 감사합니다!
+</div>
+
 <h1>안전체험교육 만족도 조사</h1>
 
-<h3>나는 어떤 친구일까요?</h3>
+<div id="group">
 
-<div class="group">
+<h2>나는 어떤 친구일까요?</h2>
 
 <button onclick="selectGroup('유아')">
 유치원 / 어린이집
@@ -62,19 +98,29 @@ color:white;
 
 </div>
 
+
 <div id="survey" style="display:none">
 
-<h2>교육이 도움이 되었나요?</h2>
+<div class="question">
 
-<div class="answer">
+교육을 통해 위험한 상황에서<br>
+어떻게 행동해야 하는지<br>
+잘 알게 되었나요?
+
+</div>
+
+<div class="answers">
 
 <button class="green" onclick="send('O')">O</button>
+
 <button class="yellow" onclick="send('△')">△</button>
+
 <button class="red" onclick="send('X')">X</button>
 
 </div>
 
 </div>
+
 
 <script>
 
@@ -82,17 +128,22 @@ const sheetURL =
 "https://script.google.com/macros/s/AKfycbx6_QNmNP3WMFBsmvd9YFmy_rP34YGyNeLUxAX-MURDD1BZ7n-Wh0FZxaOWm94jVwvn/exec";
 
 let group="";
+let lock=false;
 
 function selectGroup(g){
 
 group=g;
 
-document.querySelector(".group").style.display="none";
+document.getElementById("group").style.display="none";
 document.getElementById("survey").style.display="block";
 
 }
 
 function send(answer){
+
+if(lock) return;
+
+lock=true;
 
 fetch(sheetURL,{
 method:"POST",
@@ -103,14 +154,15 @@ answer:answer
 
 })
 
-})
+});
 
-.then(res=>res.text())
-.then(data=>{
+document.getElementById("thanks").style.display="flex";
 
-alert("응답 감사합니다!");
+setTimeout(()=>{
 
-})
+location.reload();
+
+},1500);
 
 }
 
