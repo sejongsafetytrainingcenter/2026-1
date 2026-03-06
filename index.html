@@ -8,85 +8,70 @@
 
 body{
 font-family:"Noto Sans KR",sans-serif;
-background:#fffdf7;
+background:linear-gradient(180deg,#fffdf7,#fff3cd);
 text-align:center;
 padding:20px;
 margin:0;
 }
 
-/* 제목 */
-
 h1{
 color:#ff6f00;
-font-size:60px;
+font-size:48px;
 margin-bottom:40px;
 }
 
-/* 그룹 질문 */
-
-#group h2{
-font-size:50px;
-margin-bottom:40px;
-}
-
-/* 그룹 버튼 */
-
-.groupBtn{
-font-size:40px;
-padding:30px 60px;
-margin:30px;
-border:none;
-border-radius:20px;
-cursor:pointer;
+#groupTitle{
+font-size:42px;
+margin-bottom:30px;
 font-weight:bold;
 }
 
-/* 유치원 */
+.groupBtn{
+font-size:34px;
+padding:30px 50px;
+margin:25px;
+border:none;
+border-radius:25px;
+cursor:pointer;
+box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
 
-.kinder{
+.kindergarten{
 background:#ffd54f;
 color:black;
 }
 
-/* 초등 */
-
 .elementary{
-background:#42a5f5;
+background:#4caf50;
 color:black;
 }
 
-/* 질문 */
-
 .question{
-font-size:50px;
-margin-top:40px;
+font-size:46px;
+margin-top:60px;
 line-height:1.4;
+font-weight:bold;
 }
 
-/* 응답 버튼 */
-
 .answers{
-margin-top:60px;
+margin-top:70px;
 }
 
 .answers button{
-width:220px;
-height:220px;
-font-size:90px;
+width:200px;
+height:200px;
+font-size:70px;
 border-radius:50%;
 border:none;
-margin:30px;
+margin:35px;
 color:white;
 cursor:pointer;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
-
-/* 색 */
 
 .green{background:#66bb6a;}
 .yellow{background:#ffee58;color:black;}
 .red{background:#ef5350;}
-
-/* 감사 화면 */
 
 #thanks{
 position:fixed;
@@ -98,14 +83,13 @@ background:white;
 display:flex;
 justify-content:center;
 align-items:center;
-font-size:70px;
+font-size:60px;
 font-weight:bold;
 display:none;
 z-index:999;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -118,9 +102,11 @@ z-index:999;
 
 <div id="group">
 
-<h2>나는 어떤 친구일까요?</h2>
+<div id="groupTitle">
+나는 어떤 친구일까요?
+</div>
 
-<button class="groupBtn kinder" onclick="selectGroup('유아')">
+<button class="groupBtn kindergarten" onclick="selectGroup('유아')">
 유치원 / 어린이집
 </button>
 
@@ -152,8 +138,9 @@ z-index:999;
 
 <script>
 
+/* 새 Apps Script 주소 적용 */
 const sheetURL =
-"https://script.google.com/macros/s/AKfycbx6_QNmNP3WMFBsmvd9YFmy_rP34YGyNeLUxAX-MURDD1BZ7n-Wh0FZxaOWm94jVwvn/exec";
+"https://script.google.com/macros/s/AKfycbyQN6TFE-hy5vXfA5swgboET8HRrf-ZpiWomqIIGuHoO4Yh7UYHAIntB3Ok-Zo4YX_f/exec";
 
 let group="";
 let lock=false;
@@ -173,28 +160,17 @@ if(lock) return;
 
 lock=true;
 
-/* 날짜 생성 (연월일만) */
-
-const today = new Date().toISOString().split("T")[0];
-
-/* 버튼 숨기기 */
-
-document.getElementById("survey").style.display="none";
+/* 버튼 숨김 */
+document.querySelector(".answers").style.display="none";
 
 /* 감사 화면 표시 */
-
 document.getElementById("thanks").style.display="flex";
-
-/* 모든 버튼 비활성화 */
-
-document.querySelectorAll("button").forEach(b=>b.disabled=true);
 
 /* 구글 시트 전송 */
 
 fetch(sheetURL,{
 method:"POST",
 body:JSON.stringify({
-date:today,
 group:group,
 answer:answer
 })
