@@ -187,10 +187,8 @@ th{
   </table>
 </div>
 
-<!-- 감사 화면은 맨 아래에 배치 -->
-<div id="thanks">
-  응답 감사합니다!
-</div>
+<!-- 감사 화면 맨 아래 배치 -->
+<div id="thanks">응답 감사합니다!</div>
 
 <script>
 const sheetURL =
@@ -202,7 +200,7 @@ let lock=false;
 function selectGroup(g){
   group=g;
   document.getElementById("group").style.display="none";
-  document.getElementById("survey").style.display="block";
+  document.getElementById("survey").style.display="block"; // 설문 화면 표시
 }
 
 function send(answer){
@@ -224,13 +222,13 @@ function send(answer){
     })
   });
 
-  // 3.5초 뒤 설문 초기 화면으로 돌아가기
+  // 1.5초 뒤 초기 화면으로 돌아가기
   setTimeout(()=>{
     document.getElementById("thanks").style.display="none";
     document.getElementById("survey").style.display="none";
     document.getElementById("group").style.display="block";
-    lock=false; // 잠금 해제
-  }, 3500);
+    lock=false; // 다음 응답 가능
+  }, 1500);
 }
 
 // 월별 통계
