@@ -163,54 +163,34 @@ font-weight:bold;
 
 <body>
 
-<div id="thanks">
-응답 감사합니다!
-</div>
+<div id="thanks">응답 감사합니다!</div>
 
 <h1>안전체험교육 만족도 조사</h1>
 
 <button id="statsBtn">📊 관리자 통계</button>
 
 <div id="group">
-
-<div id="groupTitle">
-나는 어떤 친구일까요?
-</div>
-
-<button class="groupBtn kindergarten" data-group="유아">
-유치원 / 어린이집
-</button>
-
-<button class="groupBtn elementary" data-group="초등">
-초등학교 저학년
-</button>
-
+<div id="groupTitle">나는 어떤 친구일까요?</div>
+<button class="groupBtn kindergarten" data-group="유아">유치원 / 어린이집</button>
+<button class="groupBtn elementary" data-group="초등">초등학교 저학년</button>
 </div>
 
 <div id="survey" style="display:none">
-
 <div class="question">
-교육을 통해 위험한 상황에서<br>
-어떻게 행동해야 하는지<br>
-잘 알게 되었나요?
+교육을 통해 위험한 상황에서<br>어떻게 행동해야 하는지<br>잘 알게 되었나요?
 </div>
-
 <div class="answers">
 <button class="green" data-answer="O">O</button>
 <button class="yellow" data-answer="△">△</button>
 <button class="red" data-answer="X">X</button>
 </div>
-
 </div>
 
 <div id="statsBox">
-
 <div class="sectionTitle">📅 오늘 응답</div>
 <div id="todayStats" class="statsGroup"></div>
-
 <div class="sectionTitle">📆 이번달 응답</div>
 <div id="monthStats" class="statsGroup"></div>
-
 </div>
 
 <script>
@@ -221,7 +201,7 @@ let lock = false;
 
 document.addEventListener("DOMContentLoaded", function(){
 
-  // 그룹 버튼 클릭
+  // 그룹 선택
   document.querySelectorAll(".groupBtn").forEach(btn=>{
       btn.addEventListener("click", ()=>{
           group = btn.dataset.group;
@@ -230,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function(){
       });
   });
 
-  // 답변 버튼 클릭
+  // 답변 제출
   document.querySelectorAll(".answers button").forEach(btn=>{
       btn.addEventListener("click", ()=>{
           if(lock) return;
@@ -272,7 +252,6 @@ document.addEventListener("DOMContentLoaded", function(){
               if(date.startsWith(month)) stats.month[g][ans]++;
           });
 
-          // 버튼 형태로 표시 함수
           function renderStats(containerId, statsObj){
               const container = document.getElementById(containerId);
               container.innerHTML="";
