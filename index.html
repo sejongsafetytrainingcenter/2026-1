@@ -1,45 +1,62 @@
-function doPost(e) {
-  try {
-    var sheet = SpreadsheetApp.openById("1g-3yaahOyCEU56DdYPcfo-fQKoi9k1M3QkSD6bAvXGw").getSheetByName("응답");
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>만족도 조사 - 안정판</title>
+<style>
+body{font-family:"Noto Sans KR",sans-serif;text-align:center;padding:20px;margin:0;background:#fffdf7;}
+h1{color:#ff6f00;font-size:48px;margin-bottom:20px;}
+button{font-size:28px;padding:20px 40px;margin:20px;border:none;border-radius:20px;cursor:pointer;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+#thanks{display:none;font-size:32px;color:#4caf50;margin-top:50px;}
+</style>
+</head>
+<body>
 
-    if(!e.postData || !e.postData.contents){
-      return ContentService.createTextOutput("POST 데이터가 없습니다.");
-    }
+<h1>안전체험교육 만족도 조사</h1>
 
-    var params = JSON.parse(e.postData.contents);
+<div id="group">
+<p>나는 어떤 친구일까요?</p>
+<button onclick="selectGroup('유아')">유치원 / 어린이집</button>
+<button onclick="selectGroup('초등')">초등학교 저학년</button>
+</div>
 
-    // 응답 삭제 요청 처리
-    if(params.mode === "delete" && params.date && params.group && params.answer){
-      var data = sheet.getDataRange().getValues();
-      var rowToDelete = -1;
-      for(var i=1;i<data.length;i++){
-        if(data[i][0]===params.date && data[i][1]===params.group && data[i][2]===params.answer){
-          rowToDelete=i+1;
-          break;
-        }
-      }
-      if(rowToDelete!==-1){ 
-        sheet.deleteRow(rowToDelete); 
-        return ContentService.createTextOutput("삭제 완료"); 
-      } else return ContentService.createTextOutput("삭제할 응답 없음");
-    }
+<div id="survey" style="display:none">
+<p>교육을 통해 위험한 상황에서 어떻게 행동해야 하는지 잘 알게 되었나요?</p>
+<button onclick="send('O')">O</button>
+<button onclick="send('△')">△</button>
+<button onclick="send('X')">X</button>
+</div>
 
-    // 응답 추가
-    sheet.appendRow([params.date, params.group, params.answer]);
-    return ContentService.createTextOutput("저장 완료");
+<div id="thanks">응답 감사합니다!</div>
 
-  } catch(err){
-    return ContentService.createTextOutput("에러: "+err.message);
-  }
+<script>
+// ✅ 웹앱 URL (최신)
+const sheetURL = "https://script.google.com/macros/s/AKfycbws0hl9hMvYQnfh6y2pPI-S5XXMPYB3n0YzXG1Te3yHANiFVa9rL7oiqKwFQMEC1QKd/exec";
+
+let group="";
+
+function selectGroup(g){
+  group = g;
+  document.getElementById("group").style.display="none";
+  document.getElementById("survey").style.display="block";
 }
 
-function doGet(e){
-  var sheet = SpreadsheetApp.openById("1g-3yaahOyCEU56DdYPcfo-fQKoi9k1M3QkSD6bAvXGw").getSheetByName("응답");
-  var data = sheet.getDataRange().getValues();
-  var result = [];
-  for(var i=1;i<data.length;i++){
-    result.push([data[i][0], data[i][1], data[i][2]]);
-  }
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
+function send(answer){
+  document.getElementById("survey").style.display="none";
+  document.getElementById("thanks").style.display="block";
+
+  // 🚀 핵심: Content-Type + 날짜 포함
+  fetch(sheetURL, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      date: new Date().toISOString().slice(0,10), // YYYY-MM-DD
+      group: group,
+      answer: answer
+    })
+  });
 }
+</script>
+
+</body>
+</html>
