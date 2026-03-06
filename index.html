@@ -20,7 +20,6 @@ font-size:40px;
 }
 
 .group button{
-
 font-size:28px;
 padding:20px 40px;
 margin:20px;
@@ -28,18 +27,14 @@ border:none;
 border-radius:15px;
 background:#ffd54f;
 cursor:pointer;
-
 }
 
 .question{
-
 font-size:40px;
 margin-top:50px;
-
 }
 
 .answers button{
-
 width:180px;
 height:180px;
 font-size:60px;
@@ -48,7 +43,6 @@ border:none;
 margin:30px;
 color:white;
 cursor:pointer;
-
 }
 
 .green{background:#66bb6a;}
@@ -56,7 +50,6 @@ cursor:pointer;
 .red{background:#ef5350;}
 
 #thanks{
-
 position:fixed;
 top:0;
 left:0;
@@ -69,7 +62,6 @@ align-items:center;
 font-size:50px;
 font-weight:bold;
 display:none;
-
 }
 
 </style>
@@ -98,7 +90,6 @@ display:none;
 
 </div>
 
-
 <div id="survey" style="display:none">
 
 <div class="question">
@@ -112,15 +103,12 @@ display:none;
 <div class="answers">
 
 <button class="green" onclick="send('O')">O</button>
-
 <button class="yellow" onclick="send('△')">△</button>
-
 <button class="red" onclick="send('X')">X</button>
 
 </div>
 
 </div>
-
 
 <script>
 
@@ -145,19 +133,22 @@ if(lock) return;
 
 lock=true;
 
+/* 모든 버튼 비활성화 */
+document.querySelectorAll("button").forEach(b=>b.disabled=true);
+
+/* 즉시 감사 화면 표시 */
+document.getElementById("thanks").style.display="flex";
+
+/* 구글 시트로 데이터 전송 */
 fetch(sheetURL,{
 method:"POST",
 body:JSON.stringify({
-
 group:group,
 answer:answer
-
 })
-
 });
 
-document.getElementById("thanks").style.display="flex";
-
+/* 1.5초 후 초기화 */
 setTimeout(()=>{
 
 location.reload();
