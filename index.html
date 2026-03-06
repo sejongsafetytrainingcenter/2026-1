@@ -54,6 +54,8 @@ h1{
 
 .answers{
   margin-top:70px;
+  display:flex; /* 버튼 항상 표시 */
+  justify-content:center;
 }
 
 .answers button{
@@ -198,17 +200,20 @@ function selectGroup(g){
   group=g;
   document.getElementById("group").style.display="none";
   document.getElementById("survey").style.display="block";
+
+  // 버튼 항상 보이도록 초기화
+  document.querySelector(".answers").style.display="flex";
 }
 
 function send(answer){
   if(lock) return;
   lock=true;
 
-  // 1️⃣ 버튼 숨기고 감사 화면 바로 표시
+  // 버튼 숨기고 감사 화면 바로 표시
   document.querySelector(".answers").style.display="none";
   document.getElementById("thanks").style.display="flex";
 
-  // 2️⃣ 서버 전송 비동기 처리
+  // 서버 전송은 비동기 처리
   setTimeout(()=> {
     fetch(sheetURL,{
       method:"POST",
@@ -219,7 +224,7 @@ function send(answer){
     });
   }, 0);
 
-  // 3️⃣ 1초 후 초기 화면으로
+  // 1초 후 초기 화면으로 돌아가기
   setTimeout(()=>{
     document.getElementById("thanks").style.display="none";
     document.getElementById("survey").style.display="none";
