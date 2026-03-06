@@ -17,7 +17,7 @@ margin:0;
 h1{
 color:#ff6f00;
 font-size:48px;
-margin-bottom:40px;
+margin-bottom:20px;
 }
 
 #groupTitle{
@@ -89,6 +89,39 @@ display:none;
 z-index:999;
 }
 
+/* 통계 스타일 */
+
+#statsBox{
+display:none;
+margin-top:40px;
+}
+
+table{
+border-collapse:collapse;
+margin:auto;
+font-size:26px;
+}
+
+th,td{
+border:1px solid #aaa;
+padding:12px 20px;
+}
+
+th{
+background:#ffe082;
+}
+
+#statsBtn{
+font-size:20px;
+padding:10px 20px;
+border:none;
+border-radius:10px;
+background:#64b5f6;
+color:white;
+cursor:pointer;
+margin-bottom:30px;
+}
+
 </style>
 </head>
 
@@ -99,6 +132,8 @@ z-index:999;
 </div>
 
 <h1>안전체험교육 만족도 조사</h1>
+
+<button id="statsBtn" onclick="showStats()">월별 통계</button>
 
 <div id="group">
 
@@ -136,9 +171,50 @@ z-index:999;
 
 </div>
 
+<div id="statsBox">
+
+<h2>월별 통계</h2>
+
+<table>
+
+<tr>
+<th>응답</th>
+<th>개수</th>
+<th>비율</th>
+</tr>
+
+<tr>
+<td>O</td>
+<td id="oCount">0</td>
+<td id="oRate">0%</td>
+</tr>
+
+<tr>
+<td>△</td>
+<td id="dCount">0</td>
+<td id="dRate">0%</td>
+</tr>
+
+<tr>
+<td>X</td>
+<td id="xCount">0</td>
+<td id="xRate">0%</td>
+</tr>
+
+<tr>
+<th>총합</th>
+<th id="totalCount">0</th>
+<th>100%</th>
+</tr>
+
+</table>
+
+</div>
+
 <script>
 
-/* 새 Apps Script 주소 적용 */
+/* Apps Script 주소 */
+
 const sheetURL =
 "https://script.google.com/macros/s/AKfycbyQN6TFE-hy5vXfA5swgboET8HRrf-ZpiWomqIIGuHoO4Yh7UYHAIntB3Ok-Zo4YX_f/exec";
 
@@ -161,12 +237,14 @@ if(lock) return;
 lock=true;
 
 /* 버튼 숨김 */
+
 document.querySelector(".answers").style.display="none";
 
-/* 감사 화면 표시 */
+/* 감사 화면 */
+
 document.getElementById("thanks").style.display="flex";
 
-/* 구글 시트 전송 */
+/* 시트 전송 */
 
 fetch(sheetURL,{
 method:"POST",
@@ -176,13 +254,71 @@ answer:answer
 })
 });
 
-/* 1.5초 후 초기화 */
+/* 초기화 */
 
 setTimeout(()=>{
-
 location.reload();
-
 },1500);
+
+}
+
+/* 월별 통계 */
+
+function showStats(){
+
+const pwd = prompt("관리자 비밀번호 입력");
+
+if(pwd !== "0705"){
+alert("비밀번호가 틀렸습니다.");
+return;
+}
+
+fetch(sheetURL)
+.then(res=>res.json())
+.then(data=>{
+
+let O=0;
+let D=0;
+let X=0;
+
+const today = new Date();
+const monthKey = today.toISOString().slice(0,7);
+
+data.slice(1).forEach(row=>{
+
+const date = row[0];
+const answer = row[2];
+
+if(String(date).startsWith(monthKey)){
+
+if(answer==="O") O++;
+if(answer==="△") D++;
+if(answer==="X") X++;
+
+}
+
+});
+
+const total = O + D + X;
+
+document.getElementById("oCount").textContent = O;
+document.getElementById("dCount").textContent = D;
+document.getElementById("xCount").textContent = X;
+
+document.getElementById("oRate").textContent =
+total ? (O/total*100).toFixed(1)+"%" : "0%";
+
+document.getElementById("dRate").textContent =
+total ? (D/total*100).toFixed(1)+"%" : "0%";
+
+document.getElementById("xRate").textContent =
+total ? (X/total*100).toFixed(1)+"%" : "0%";
+
+document.getElementById("totalCount").textContent = total;
+
+document.getElementById("statsBox").style.display="block";
+
+});
 
 }
 
