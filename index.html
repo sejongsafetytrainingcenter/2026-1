@@ -1,136 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>친구 유형 테스트</title>
+<title>세종시안전체험교육원 만족도 조사</title>
 
 <style>
 
 body{
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#e0f2fe,#f0f9ff);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
+font-family:"Noto Sans KR",sans-serif;
+background:linear-gradient(135deg,#fff7cc,#fffdf7);
+text-align:center;
+padding:40px;
+margin:0;
 }
 
-.container{
-  background:white;
-  padding:40px;
-  border-radius:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
-  text-align:center;
-  width:350px;
+/* 제목 */
+
+h1{
+color:#ff6f00;
+font-size:60px;
+margin-bottom:40px;
 }
 
-.title{
-  font-size:28px;
-  font-weight:bold;
-  margin-bottom:10px;
+/* 그룹 질문 */
+
+#group h2{
+font-size:48px;
+margin-bottom:40px;
+color:#444;
 }
 
-.subtitle{
-  color:#666;
-  margin-bottom:30px;
+/* 그룹 버튼 */
+
+#group button{
+font-size:38px;
+padding:30px 60px;
+margin:25px;
+border:none;
+border-radius:25px;
+background:#ffd54f;
+cursor:pointer;
+box-shadow:0 10px 20px rgba(0,0,0,0.15);
+transition:0.2s;
 }
 
-.button-group{
-  display:flex;
-  flex-direction:column;
-  gap:15px;
+#group button:hover{
+transform:scale(1.05);
+background:#ffca28;
 }
 
-button{
-  padding:15px;
-  font-size:18px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  transition:0.2s;
+/* 질문 박스 */
+
+.question{
+font-size:48px;
+margin-top:60px;
+line-height:1.5;
+background:#fff3cd;
+padding:40px;
+border-radius:30px;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+display:inline-block;
 }
 
-.circle{
-  background:#a5f3fc;
+/* 답변 버튼 영역 */
+
+.answers{
+margin-top:50px;
 }
 
-.triangle{
-  background:#fde68a;
+/* 답변 버튼 */
+
+.answers button{
+width:240px;
+height:240px;
+font-size:90px;
+border-radius:50%;
+border:none;
+margin:35px;
+color:white;
+cursor:pointer;
+box-shadow:0 10px 25px rgba(0,0,0,0.25);
+transition:0.2s;
 }
 
-.cross{
-  background:#fecaca;
+.answers button:hover{
+transform:scale(1.1);
 }
 
-button:hover{
-  transform:scale(1.05);
-}
+/* 버튼 색상 */
 
-button:disabled{
-  opacity:0.5;
-  cursor:not-allowed;
-}
+.green{background:#66bb6a;}
+.yellow{background:#ffee58;color:black;}
+.red{background:#ef5350;}
 
-#result{
-  margin-top:20px;
-  font-weight:bold;
-  color:#2563eb;
+/* 감사 화면 */
+
+#thanks{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:white;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:70px;
+font-weight:bold;
+color:#333;
+display:none;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
-
-<div class="title">
-나는 어떤 친구일까요?
+<div id="thanks">
+응답 감사합니다!
 </div>
 
-<div class="subtitle">
-가장 가깝다고 생각하는 유형을 눌러주세요
-</div>
+<h1>안전체험교육 만족도 조사</h1>
 
-<div class="button-group">
+<div id="group">
 
-<button class="circle" onclick="sendResponse('circle',this)">
-⭕ 동그라미 친구
+<h2>나는 어떤 친구일까요?</h2>
+
+<button onclick="selectGroup('유아')">
+유치원 / 어린이집
 </button>
 
-<button class="triangle" onclick="sendResponse('triangle',this)">
-🔺 세모 친구
-</button>
-
-<button class="cross" onclick="sendResponse('cross',this)">
-❌ 엑스 친구
+<button onclick="selectGroup('초등')">
+초등학교 저학년
 </button>
 
 </div>
 
-<div id="result"></div>
+<div id="survey" style="display:none">
+
+<div class="question">
+
+교육을 통해 위험한 상황에서<br>
+어떻게 행동해야 하는지<br>
+잘 알게 되었나요?
+
+</div>
+
+<div class="answers">
+
+<button class="green" onclick="send('O')">O</button>
+<button class="yellow" onclick="send('△')">△</button>
+<button class="red" onclick="send('X')">X</button>
+
+</div>
 
 </div>
 
 <script>
 
-const url = "https://script.google.com/macros/s/AKfycbx6_QNmNP3WMFBsmvd9YFmy_rP34YGyNeLUxAX-MURDD1BZ7n-Wh0FZxaOWm94jVwvn/exec";
+const sheetURL =
+"https://script.google.com/macros/s/AKfycbx6_QNmNP3WMFBsmvd9YFmy_rP34YGyNeLUxAX-MURDD1BZ7n-Wh0FZxaOWm94jVwvn/exec";
 
-function sendResponse(type,btn){
+let group="";
+let lock=false;
 
-document.querySelectorAll("button").forEach(b => b.disabled=true);
+function selectGroup(g){
 
-document.getElementById("result").innerText="응답 저장 중...";
+group=g;
 
-fetch(url+"?type="+type)
-.then(res=>res.text())
-.then(data=>{
-document.getElementById("result").innerText="응답해주셔서 감사합니다 😊";
+document.getElementById("group").style.display="none";
+document.getElementById("survey").style.display="block";
+
+}
+
+function send(answer){
+
+if(lock) return;
+
+lock=true;
+
+/* 모든 버튼 비활성화 */
+document.querySelectorAll("button").forEach(b=>b.disabled=true);
+
+/* 즉시 감사 화면 표시 */
+document.getElementById("thanks").style.display="flex";
+
+/* 구글 시트로 데이터 전송 */
+fetch(sheetURL,{
+method:"POST",
+body:JSON.stringify({
+group:group,
+answer:answer
 })
-.catch(err=>{
-document.getElementById("result").innerText="오류가 발생했습니다.";
 });
+
+/* 1.5초 후 초기화 */
+setTimeout(()=>{
+
+location.reload();
+
+},1500);
 
 }
 
