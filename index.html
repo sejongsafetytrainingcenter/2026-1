@@ -5,7 +5,6 @@
 <title>세종시안전체험교육원 만족도 조사</title>
 
 <style>
-
 body{
 font-family:"Noto Sans KR",sans-serif;
 background:linear-gradient(180deg,#fffdf7,#fff3cd);
@@ -45,6 +44,11 @@ border:none;
 border-radius:25px;
 cursor:pointer;
 box-shadow:0 8px 20px rgba(0,0,0,0.2);
+transition: transform 0.1s;
+}
+
+.groupBtn:hover{
+transform: scale(1.05);
 }
 
 .kindergarten{
@@ -78,6 +82,11 @@ margin:35px;
 color:white;
 cursor:pointer;
 box-shadow:0 10px 25px rgba(0,0,0,0.3);
+transition: transform 0.1s;
+}
+
+.answers button:hover{
+transform: scale(1.1);
 }
 
 .green{background:#66bb6a;}
@@ -137,7 +146,7 @@ font-weight:bold;
 
 <h1>안전체험교육 만족도 조사</h1>
 
-<button id="statsBtn" onclick="showStats()">📊 관리자 통계</button>
+<button id="statsBtn">📊 관리자 통계</button>
 
 <div id="group">
 
@@ -145,11 +154,11 @@ font-weight:bold;
 나는 어떤 친구일까요?
 </div>
 
-<button class="groupBtn kindergarten" onclick="selectGroup('유아')">
+<button class="groupBtn kindergarten" data-group="유아">
 유치원 / 어린이집
 </button>
 
-<button class="groupBtn elementary" onclick="selectGroup('초등')">
+<button class="groupBtn elementary" data-group="초등">
 초등학교 저학년
 </button>
 
@@ -164,9 +173,9 @@ font-weight:bold;
 </div>
 
 <div class="answers">
-<button class="green" onclick="send('O')">O</button>
-<button class="yellow" onclick="send('△')">△</button>
-<button class="red" onclick="send('X')">X</button>
+<button class="green" data-answer="O">O</button>
+<button class="yellow" data-answer="△">△</button>
+<button class="red" data-answer="X">X</button>
 </div>
 
 </div>
@@ -176,173 +185,128 @@ font-weight:bold;
 <div class="sectionTitle">📅 오늘 응답</div>
 
 <table>
-
 <tr>
 <th></th>
 <th>O</th>
 <th>△</th>
 <th>X</th>
 </tr>
-
 <tr>
 <th>유아</th>
 <td id="todayKidO">0</td>
 <td id="todayKidD">0</td>
 <td id="todayKidX">0</td>
 </tr>
-
 <tr>
 <th>초등</th>
 <td id="todayEleO">0</td>
 <td id="todayEleD">0</td>
 <td id="todayEleX">0</td>
 </tr>
-
 </table>
 
 <div class="sectionTitle">📆 이번달 응답</div>
 
 <table>
-
 <tr>
 <th></th>
 <th>O</th>
 <th>△</th>
 <th>X</th>
 </tr>
-
 <tr>
 <th>유아</th>
 <td id="monthKidO">0</td>
 <td id="monthKidD">0</td>
 <td id="monthKidX">0</td>
 </tr>
-
 <tr>
 <th>초등</th>
 <td id="monthEleO">0</td>
 <td id="monthEleD">0</td>
 <td id="monthEleX">0</td>
 </tr>
-
 </table>
 
 </div>
 
 <script>
 
-const sheetURL =
-"https://script.google.com/macros/s/AKfycbyQN6TFE-hy5vXfA5swgboET8HRrf-ZpiWomqIIGuHoO4Yh7UYHAIntB3Ok-Zo4YX_f/exec";
+const sheetURL = "https://script.google.com/macros/s/AKfycbyQN6TFE-hy5vXfA5swgboET8HRrf-ZpiWomqIIGuHoO4Yh7UYHAIntB3Ok-Zo4YX_f/exec";
 
-let group="";
-let lock=false;
+let group = "";
+let lock = false;
 
-function selectGroup(g){
-
-group=g;
-
-document.getElementById("group").style.display="none";
-document.getElementById("survey").style.display="block";
-
-}
-
-function send(answer){
-
-if(lock) return;
-
-lock=true;
-
-document.querySelector(".answers").style.display="none";
-
-document.getElementById("thanks").style.display="flex";
-
-fetch(sheetURL,{
-method:"POST",
-body:JSON.stringify({
-group:group,
-answer:answer
-})
+// 그룹 버튼 클릭 처리
+document.querySelectorAll(".groupBtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        group = btn.dataset.group;
+        document.getElementById("group").style.display="none";
+        document.getElementById("survey").style.display="block";
+    });
 });
 
-setTimeout(()=>{
+// 답변 버튼 클릭 처리
+document.querySelectorAll(".answers button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        if(lock) return;
+        lock=true;
+        document.querySelector(".answers").style.display="none";
+        document.getElementById("thanks").style.display="flex";
 
-location.reload();
+        fetch(sheetURL,{
+            method:"POST",
+            body:JSON.stringify({
+                group:group,
+                answer:btn.dataset.answer
+            })
+        });
 
-},1500);
-
-}
-
-function showStats(){
-
-const pwd=prompt("관리자 비밀번호 입력");
-
-if(pwd!=="0705"){
-alert("비밀번호 틀림");
-return;
-}
-
-fetch(sheetURL)
-.then(res=>res.json())
-.then(data=>{
-
-const today=new Date().toISOString().slice(0,10);
-const month=today.slice(0,7);
-
-let stats={
-
-today:{
-유아:{O:0,△:0,X:0},
-초등:{O:0,△:0,X:0}
-},
-
-month:{
-유아:{O:0,△:0,X:0},
-초등:{O:0,△:0,X:0}
-}
-
-};
-
-data.slice(1).forEach(row=>{
-
-const date=row[0];
-const group=row[1];
-const answer=row[2];
-
-if(date===today){
-
-stats.today[group][answer]++;
-
-}
-
-if(date.startsWith(month)){
-
-stats.month[group][answer]++;
-
-}
-
+        setTimeout(()=>{ location.reload(); },1500);
+    });
 });
 
-document.getElementById("todayKidO").textContent=stats.today.유아.O;
-document.getElementById("todayKidD").textContent=stats.today.유아.△;
-document.getElementById("todayKidX").textContent=stats.today.유아.X;
+// 관리자 통계
+document.getElementById("statsBtn").addEventListener("click", ()=>{
+    const pwd=prompt("관리자 비밀번호 입력");
+    if(pwd!=="0705"){ alert("비밀번호 틀림"); return; }
 
-document.getElementById("todayEleO").textContent=stats.today.초등.O;
-document.getElementById("todayEleD").textContent=stats.today.초등.△;
-document.getElementById("todayEleX").textContent=stats.today.초등.X;
+    fetch(sheetURL)
+    .then(res=>res.json())
+    .then(data=>{
+        const today=new Date().toISOString().slice(0,10);
+        const month=today.slice(0,7);
 
-document.getElementById("monthKidO").textContent=stats.month.유아.O;
-document.getElementById("monthKidD").textContent=stats.month.유아.△;
-document.getElementById("monthKidX").textContent=stats.month.유아.X;
+        let stats={
+            today:{유아:{O:0,△:0,X:0}, 초등:{O:0,△:0,X:0}},
+            month:{유아:{O:0,△:0,X:0}, 초등:{O:0,△:0,X:0}}
+        };
 
-document.getElementById("monthEleO").textContent=stats.month.초등.O;
-document.getElementById("monthEleD").textContent=stats.month.초등.△;
-document.getElementById("monthEleX").textContent=stats.month.초등.X;
+        data.slice(1).forEach(row=>{
+            const date=row[0], g=row[1], ans=row[2];
+            if(date===today) stats.today[g][ans]++;
+            if(date.startsWith(month)) stats.month[g][ans]++;
+        });
 
-document.getElementById("statsBox").style.display="block";
+        document.getElementById("todayKidO").textContent=stats.today.유아.O;
+        document.getElementById("todayKidD").textContent=stats.today.유아.△;
+        document.getElementById("todayKidX").textContent=stats.today.유아.X;
 
+        document.getElementById("todayEleO").textContent=stats.today.초등.O;
+        document.getElementById("todayEleD").textContent=stats.today.초등.△;
+        document.getElementById("todayEleX").textContent=stats.today.초등.X;
+
+        document.getElementById("monthKidO").textContent=stats.month.유아.O;
+        document.getElementById("monthKidD").textContent=stats.month.유아.△;
+        document.getElementById("monthKidX").textContent=stats.month.유아.X;
+
+        document.getElementById("monthEleO").textContent=stats.month.초등.O;
+        document.getElementById("monthEleD").textContent=stats.month.초등.△;
+        document.getElementById("monthEleX").textContent=stats.month.초등.X;
+
+        document.getElementById("statsBox").style.display="block";
+    });
 });
-
-}
 
 </script>
 
