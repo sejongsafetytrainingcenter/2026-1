@@ -1,148 +1,322 @@
-<style>
-  /* 전체 배경과 폰트 */
-  body {
-    font-family: "Comic Sans MS", "Noto Sans KR", sans-serif;
-    background: #fff8f0; /* 부드러운 아이보리 */
-    margin: 0;
-    padding: 20px;
-    text-align: center;
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>세종시안전체험교육원 설문</title>
+  <style>
+    /* 전체 배경과 폰트 */
+    body {
+      font-family: "Comic Sans MS", "Noto Sans KR", sans-serif;
+      background: #fff8f0; /* 부드러운 아이보리 */
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header img {
+      width: 120px;
+      margin-bottom: 10px;
+      border-radius: 50%; /* 귀엽게 동그랗게 */
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      color: #ff8a65; /* 부드러운 주황 */
+      font-size: 2.4em;
+      text-shadow: 1px 1px 2px #fff3e0;
+    }
+
+    .date {
+      margin-bottom: 20px;
+      font-size: 1.4em;
+      color: #7b7b7b;
+    }
+
+    /* 그룹 선택 버튼 */
+    .group-select button {
+      font-size: 1.3em;
+      padding: 12px 24px;
+      margin: 10px;
+      border-radius: 20px;
+      border: none;
+      background-color: #ffd180;
+      cursor: pointer;
+      transition: transform 0.3s, background-color 0.3s;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .group-select button:hover {
+      transform: scale(1.1);
+      background-color: #ffb74d;
+    }
+
+    /* 질문 박스 */
+    .question {
+      font-size: 2em;
+      font-weight: bold;
+      margin: 60px 0 20px;
+      color: #555;
+      background-color: #ffe0b2;
+      padding: 25px 20px;
+      border-radius: 25px;
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+      display: inline-block;
+      line-height: 1.5em;
+    }
+
+    /* 답변 버튼 */
+    .answer-buttons button {
+      width: 160px;
+      height: 160px;
+      margin: 20px;
+      border: none;
+      border-radius: 50%;
+      font-size: 2.2em;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    .answer-buttons button:hover {
+      transform: scale(1.15) rotate(-5deg);
+      box-shadow: 6px 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .green { background-color: #81c784; }
+    .yellow { background-color: #fff176; color: #333; }
+    .red { background-color: #e57373; }
+
+    /* 통계 테이블 */
+    table {
+      border-collapse: collapse;
+      margin: 20px auto;
+      font-size: 1.1em;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    th {
+      background-color: #ffd54f;
+      color: #444;
+      padding: 12px;
+    }
+
+    td {
+      padding: 10px;
+      background-color: #fff3e0;
+    }
+
+    .hide-stats-btn, .cancel-btn {
+      margin-top: 20px;
+      font-size: 1em;
+      padding: 10px 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      background-color: #64b5f6;
+      transition: transform 0.3s;
+    }
+
+    .hide-stats-btn:hover, .cancel-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* 오버레이 */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.95);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      color: #ff7043;
+      font-weight: bold;
+      border-radius: 20px;
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="overlay">응답이 완료되었습니다</div>
+  <header>
+    <img src="logo_placeholder.png" alt="세종시안전체험교육원 로고">
+    <h1>안전체험교육 설문조사</h1>
+    <div class="date">오늘: <span id="date"></span> (<span id="weekday"></span>)</div>
+  </header>
+
+  <div class="group-select" id="groupButtons">
+    <p style="font-size:1.2em; margin-bottom: 10px;">나는 어떤 친구일까요?</p>
+    <button onclick="selectGroup('유아')">유치원 / 어린이집</button>
+    <button onclick="selectGroup('초등')">초등학교 저학년</button>
+  </div>
+
+  <div class="question" id="questionSection" style="display:none;">
+    안전체험교육를 통해<br><strong>위험한 상황에서 어떻게 행동해야 하는지</strong><br>잘 알게 되었나요?
+    <div class="answer-buttons">
+      <button class="green" onclick="submitAnswer('O')">O</button>
+      <button class="yellow" onclick="submitAnswer('△')">△</button>
+      <button class="red" onclick="submitAnswer('X')">X</button>
+    </div>
+    <button class="cancel-btn" onclick="cancelAnswer()">응답 취소</button>
+  </div>
+
+  <button class="hide-stats-btn" onclick="requestPassword()">통계 보기</button>
+
+  <div class="stats" id="statsTable">
+    <h2>통계 - <span id="selectedGroup"></span></h2>
+    <div id="statsContent"></div>
+  </div>
+
+  <script>
+    // === 기존 JS 그대로 ===
+const sheetURL = "https://script.google.com/macros/s/AKfycbws0hl9hMvYQnfh6y2pPI-S5XXMPYB3n0YzXG1Te3yHANiFVa9rL7oiqKwFQMEC1QKd/exec";
+const now = new Date();
+const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+const today = kst.toISOString().slice(0, 10);
+const monthKey = today.slice(0, 7);
+const weekDay = ["일", "월", "화", "수", "목", "금", "토"];
+const dayOfWeek = kst.getUTCDay();
+
+document.getElementById("date").textContent = today;
+document.getElementById("weekday").textContent = weekDay[dayOfWeek];
+
+let selectedGroup = "";
+let lastAnswer = null;
+
+function selectGroup(group) {
+  selectedGroup = group;
+  document.getElementById("selectedGroup").textContent = group;
+  document.getElementById("questionSection").style.display = "block";
+  document.getElementById("groupButtons").style.display = "none";
+  updateCountsFromSheet();
+}
+
+function showOverlay() {
+  const overlay = document.getElementById("overlay");
+  overlay.style.display = "flex";
+  setTimeout(() => {
+    overlay.style.display = "none";
+  }, 1000);
+}
+
+function submitAnswer(answer) {
+  if (!selectedGroup) {
+    alert("먼저 어떤 친구인지 선택해주세요!");
+    return;
   }
 
-  header img {
-    width: 120px;
-    margin-bottom: 10px;
-    border-radius: 50%; /* 귀엽게 동그랗게 */
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  const timestamp = new Date().toISOString();
+
+  showOverlay();
+
+  fetch(sheetURL, {
+    method: "POST",
+    contentType: "application/json",
+    body: JSON.stringify({
+      date: today,
+      time: timestamp,
+      group: selectedGroup,
+      answer: answer
+    })
+  })
+  .then(response => response.text())
+  .then(() => {
+    lastAnswer = { answer, timestamp };
+    updateCountsFromSheet();
+  })
+  .catch(console.error);
+}
+
+function cancelAnswer() {
+  if (!lastAnswer) {
+    alert("취소할 응답이 없습니다!");
+    return;
   }
 
-  h1 {
-    color: #ff8a65; /* 부드러운 주황 */
-    font-size: 2.4em;
-    text-shadow: 1px 1px 2px #fff3e0;
-  }
+  fetch(sheetURL, {
+    method: "POST",
+    contentType: "application/json",
+    body: JSON.stringify({
+      date: today,
+      time: lastAnswer.timestamp,
+      group: selectedGroup,
+      answer: "취소"
+    })
+  })
+  .then(response => response.text())
+  .then(() => {
+    lastAnswer = null;
+    updateCountsFromSheet();
+  })
+  .catch(console.error);
+}
 
-  .date {
-    margin-bottom: 20px;
-    font-size: 1.4em;
-    color: #7b7b7b;
-  }
+function updateCountsFromSheet() {
+  fetch(sheetURL)
+    .then(res => res.json())
+    .then(data => {
+      const headers = data[0];
+      const rows = data.slice(1);
+      const daily = {"O": 0, "△": 0, "X": 0};
+      const monthly = {"O": 0, "△": 0, "X": 0};
 
-  /* 그룹 선택 버튼 */
-  .group-select button {
-    font-size: 1.3em;
-    padding: 12px 24px;
-    margin: 10px;
-    border-radius: 20px;
-    border: none;
-    background-color: #ffd180;
-    cursor: pointer;
-    transition: transform 0.3s, background-color 0.3s;
-    box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
-  }
+      rows.forEach(row => {
+        const [date, group, answer] = row;
+        if (group === selectedGroup) {
+          if (date === today) daily[answer]++;
+          if (date.startsWith(monthKey)) monthly[answer]++;
+        }
+      });
 
-  .group-select button:hover {
-    transform: scale(1.1);
-    background-color: #ffb74d;
-  }
+      drawStatsTable(daily, monthly);
+    })
+    .catch(console.error);
+}
 
-  /* 질문 박스 */
-  .question {
-    font-size: 2em;
-    font-weight: bold;
-    margin: 60px 0 20px;
-    color: #555;
-    background-color: #ffe0b2;
-    padding: 25px 20px;
-    border-radius: 25px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
-    display: inline-block;
-    line-height: 1.5em;
+function requestPassword() {
+  const pwd = prompt("관리자 비밀번호를 입력하세요:");
+  if (pwd === "0705") {
+    document.getElementById("statsTable").style.display = "block";
+    updateCountsFromSheet();
+    drawStatsTable({}, {});
+  } else {
+    alert("비밀번호가 틀렸습니다.");
   }
+}
 
-  /* 답변 버튼 */
-  .answer-buttons button {
-    width: 160px;
-    height: 160px;
-    margin: 20px;
-    border: none;
-    border-radius: 50%;
-    font-size: 2.2em;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
-    transition: transform 0.3s, box-shadow 0.3s;
-    position: relative;
-  }
+function drawStatsTable(daily, monthly) {
+  const totalMonthly = Object.values(monthly).reduce((a,b)=>a+b, 0) || 1;
 
-  .answer-buttons button:hover {
-    transform: scale(1.15) rotate(-5deg);
-    box-shadow: 6px 6px 20px rgba(0,0,0,0.3);
-  }
+  const makeTable = (title, data, total) => `
+    <h3>${title}</h3>
+    <table>
+      <tr><th>응답</th><th>개수</th><th>백분율</th></tr>
+      <tr><td>O</td><td>${data["O"]}</td><td>${(data["O"]/total*100).toFixed(1)}%</td></tr>
+      <tr><td>△</td><td>${data["△"]}</td><td>${(data["△"]/total*100).toFixed(1)}%</td></tr>
+      <tr><td>X</td><td>${data["X"]}</td><td>${(data["X"]/total*100).toFixed(1)}%</td></tr>
+      <tr><th>총합</th><th>${total}</th><th>100%</th></tr>
+    </table>
+  `;
 
-  .green { background-color: #81c784; }
-  .yellow { background-color: #fff176; color: #333; }
-  .red { background-color: #e57373; }
-
-  /* 통계 테이블 */
-  table {
-    border-collapse: collapse;
-    margin: 20px auto;
-    font-size: 1.1em;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  }
-
-  th {
-    background-color: #ffd54f;
-    color: #444;
-    padding: 12px;
-  }
-
-  td {
-    padding: 10px;
-    background-color: #fff3e0;
-  }
-
-  .hide-stats-btn, .cancel-btn {
-    margin-top: 20px;
-    font-size: 1em;
-    padding: 10px 18px;
-    cursor: pointer;
-    border: none;
-    border-radius: 20px;
-    color: white;
-    background-color: #64b5f6;
-    transition: transform 0.3s;
-  }
-
-  .hide-stats-btn:hover, .cancel-btn:hover {
-    transform: scale(1.1);
-  }
-
-  /* 오버레이 */
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(255, 255, 255, 0.95);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5em;
-    color: #ff7043;
-    font-weight: bold;
-    border-radius: 20px;
-    display: none;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-
-  @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
-  }
-</style>
+  document.getElementById("statsContent").innerHTML =
+    makeTable(`월별 누적 통계 (${monthKey})`, monthly, totalMonthly);
+}
+  </script>
+</body>
+</html>
