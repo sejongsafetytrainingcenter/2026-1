@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>세종시안전체험교육원 설문</title>
+
+<style>
+
+body{
+font-family:sans-serif;
+text-align:center;
+background:#fffdf7;
+padding:20px;
+}
+
+h1{
+color:#ff6f00;
+}
+
+.group button{
+font-size:20px;
+padding:15px 25px;
+margin:10px;
+border-radius:10px;
+border:none;
+background:#ffd54f;
+}
+
+.answer button{
+width:150px;
+height:150px;
+font-size:40px;
+margin:20px;
+border-radius:50%;
+border:none;
+color:white;
+}
+
+.green{background:#66bb6a;}
+.yellow{background:#ffee58;color:black;}
+.red{background:#ef5350;}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>안전체험교육 만족도 조사</h1>
+
+<h3>나는 어떤 친구일까요?</h3>
+
+<div class="group">
+
+<button onclick="selectGroup('유아')">
+유치원 / 어린이집
+</button>
+
+<button onclick="selectGroup('초등')">
+초등학교 저학년
+</button>
+
+</div>
+
+<div id="survey" style="display:none">
+
+<h2>교육이 도움이 되었나요?</h2>
+
+<div class="answer">
+
+<button class="green" onclick="send('O')">O</button>
+<button class="yellow" onclick="send('△')">△</button>
+<button class="red" onclick="send('X')">X</button>
+
+</div>
+
+</div>
+
+<script>
+
+const sheetURL =
+"https://script.google.com/macros/s/AKfycbx6_QNmNP3WMFBsmvd9YFmy_rP34YGyNeLUxAX-MURDD1BZ7n-Wh0FZxaOWm94jVwvn/exec";
+
+let group="";
+
+function selectGroup(g){
+
+group=g;
+
+document.querySelector(".group").style.display="none";
+document.getElementById("survey").style.display="block";
+
+}
+
+function send(answer){
+
+fetch(sheetURL,{
+method:"POST",
+body:JSON.stringify({
+
+group:group,
+answer:answer
+
+})
+
+})
+
+.then(res=>res.text())
+.then(data=>{
+
+alert("응답 감사합니다!");
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
