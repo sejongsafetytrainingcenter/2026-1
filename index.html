@@ -11,11 +11,11 @@
       padding: 20px;
       text-align: center;
     }
-    header img {
-      width: 120px;
+    header .logo-text {
+      font-size: 1.6em;
+      font-weight: bold;
+      color: #ff8a65;
       margin-bottom: 10px;
-      border-radius: 50%;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     }
     h1 {
       color: #ff8a65;
@@ -128,12 +128,14 @@
       from {opacity: 0;}
       to {opacity: 1;}
     }
+    /* 통계 상단 글씨 숨기기 */
+    #statsTable h2 { display: none; }
   </style>
 </head>
 <body>
   <div class="overlay" id="overlay">응답이 완료되었습니다</div>
   <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/Sejong_City_Office_of_Education_Symbol.svg" alt="세종특별자치시교육청 로고">
+    <div class="logo-text">세종시 안전체험교육원 😄</div>
     <h1>안전체험교육 설문조사</h1>
     <div class="date">오늘: <span id="date"></span> (<span id="weekday"></span>)</div>
   </header>
@@ -157,7 +159,6 @@
   <button class="stats-btn" onclick="requestPassword()">월별 통계</button>
 
   <div class="stats" id="statsTable" style="display:none;">
-    <h2>통계 - <span id="selectedGroup"></span></h2>
     <div id="statsContent"></div>
   </div>
 
@@ -178,7 +179,6 @@ let lastAnswer = null;
 
 function selectGroup(group) {
   selectedGroup = group;
-  document.getElementById("selectedGroup").textContent = group;
   document.getElementById("questionSection").style.display = "block";
   document.getElementById("groupButtons").style.display = "none";
   updateCountsFromSheet();
@@ -221,16 +221,12 @@ function updateCountsFromSheet() {
     .then(res => res.json())
     .then(data => {
       const rows = data.slice(1);
-      const daily = {"O": 0, "△": 0, "X": 0};
       const monthly = {"O": 0, "△": 0, "X": 0};
       rows.forEach(row => {
         const [date, group, answer] = row;
-        if(group === selectedGroup){
-          if(date === today) daily[answer]++;
-          if(date.startsWith(monthKey)) monthly[answer]++;
-        }
+        if(group === selectedGroup && date.startsWith(monthKey)) monthly[answer]++;
       });
-      drawStatsTable(daily, monthly);
+      drawStatsTable(monthly);
     })
     .catch(console.error);
 }
@@ -243,19 +239,18 @@ function requestPassword() {
   } else { alert("비밀번호가 틀렸습니다."); }
 }
 
-function drawStatsTable(daily, monthly) {
+function drawStatsTable(monthly) {
   const totalMonthly = Object.values(monthly).reduce((a,b)=>a+b,0) || 1;
-  const makeTable = (title, data, total) => `
-    <h3>${title}</h3>
+  const makeTable = `
     <table>
       <tr><th>응답</th><th>개수</th><th>백분율</th></tr>
-      <tr><td>O</td><td>${data["O"]}</td><td>${(data["O"]/total*100).toFixed(1)}%</td></tr>
-      <tr><td>△</td><td>${data["△"]}</td><td>${(data["△"]/total*100).toFixed(1)}%</td></tr>
-      <tr><td>X</td><td>${data["X"]}</td><td>${(data["X"]/total*100).toFixed(1)}%</td></tr>
-      <tr><th>총합</th><th>${total}</th><th>100%</th></tr>
+      <tr><td>O</td><td>${monthly["O"]}</td><td>${(monthly["O"]/totalMonthly*100).toFixed(1)}%</td></tr>
+      <tr><td>△</td><td>${monthly["△"]}</td><td>${(monthly["△"]/totalMonthly*100).toFixed(1)}%</td></tr>
+      <tr><td>X</td><td>${monthly["X"]}</td><td>${(monthly["X"]/totalMonthly*100).toFixed(1)}%</td></tr>
+      <tr><th>총합</th><th>${totalMonthly}</th><th>100%</th></tr>
     </table>
   `;
-  document.getElementById("statsContent").innerHTML = makeTable(`월별 누적 통계 (${monthKey})`, monthly, totalMonthly);
+  document.getElementById("statsContent").innerHTML = makeTable;
 }
   </script>
 </body>
