@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -141,7 +140,6 @@ display:none;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -161,7 +159,7 @@ display:none;
 </div>
 
 <div class="question" id="questionSection" style="display:none;">
-안전체험교육을 통해<br>
+안전체험교육를 통해<br>
 <strong>위험한 상황에서 어떻게 행동해야 하는지</strong><br>
 잘 알게 되었나요?
 
@@ -220,8 +218,11 @@ setTimeout(()=>{overlay.style.display="none"},1000);
 function submitAnswer(answer){
 
 if(!selectedGroup){
+
 alert("먼저 어떤 친구인지 선택해주세요!");
+
 return;
+
 }
 
 const timestamp=new Date().toISOString();
@@ -230,7 +231,7 @@ showOverlay();
 
 fetch(sheetURL,{
 method:"POST",
-headers:{ "Content-Type":"application/json" },
+contentType:"application/json",
 body:JSON.stringify({
 date:today,
 time:timestamp,
@@ -239,7 +240,13 @@ answer:answer
 })
 })
 
-.then(()=>{ lastAnswer={answer,timestamp}; })
+.then(r=>r.text())
+.then(()=>{
+
+lastAnswer={answer,timestamp};
+
+})
+
 .catch(console.error);
 
 }
@@ -247,13 +254,16 @@ answer:answer
 function cancelAnswer(){
 
 if(!lastAnswer){
+
 alert("취소할 응답이 없습니다!");
+
 return;
+
 }
 
 fetch(sheetURL,{
 method:"POST",
-headers:{ "Content-Type":"application/json" },
+contentType:"application/json",
 body:JSON.stringify({
 date:today,
 time:lastAnswer.timestamp,
@@ -262,7 +272,13 @@ answer:"취소"
 })
 })
 
-.then(()=>{ lastAnswer=null; })
+.then(r=>r.text())
+.then(()=>{
+
+lastAnswer=null;
+
+})
+
 .catch(console.error);
 
 }
@@ -275,24 +291,28 @@ fetch(sheetURL)
 
 .then(data=>{
 
-const rows=(data.data || data).slice(1);
+const rows=data.slice(1);
 
 const monthly={O:0,"△":0,X:0};
 
 rows.forEach(row=>{
 
 const date=row[0];
-const answer=row[2] ? row[2].toString().trim() : "";
 
-if(["O","△","X"].includes(answer)){
+const group=row[1];
+
+const answer=row[2]?.toString().trim();
+
+if((!selectedGroup || group===selectedGroup)&&["O","△","X"].includes(answer)){
 
 const d=new Date(date);
 
-const rowMonth=
-d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+const rowMonth=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 
 if(rowMonth===monthKey){
+
 monthly[answer]++;
+
 }
 
 }
@@ -327,7 +347,7 @@ alert("비밀번호가 틀렸습니다.");
 
 function drawStatsTable(monthly){
 
-const total=monthly.O+monthly["△"]+monthly.X;
+const total=Object.values(monthly).reduce((a,b)=>a+b,0);
 
 const safeTotal=total===0?1:total;
 
@@ -336,33 +356,53 @@ const html=`
 <table>
 
 <tr>
+
 <th>응답</th>
+
 <th>개수</th>
+
 <th>백분율</th>
+
 </tr>
 
 <tr>
+
 <td>O</td>
+
 <td>${monthly.O}</td>
+
 <td>${(monthly.O/safeTotal*100).toFixed(1)}%</td>
+
 </tr>
 
 <tr>
+
 <td>△</td>
+
 <td>${monthly["△"]}</td>
+
 <td>${(monthly["△"]/safeTotal*100).toFixed(1)}%</td>
+
 </tr>
 
 <tr>
+
 <td>X</td>
+
 <td>${monthly.X}</td>
+
 <td>${(monthly.X/safeTotal*100).toFixed(1)}%</td>
+
 </tr>
 
 <tr>
+
 <th>총합</th>
+
 <th>${total}</th>
+
 <th>100%</th>
+
 </tr>
 
 </table>
