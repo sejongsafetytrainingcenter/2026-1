@@ -64,6 +64,7 @@
 </head>
 <body>
   <div class="overlay" id="overlay">응답이 완료되었습니다</div>
+
   <header>
     <h1>안전체험교육 설문조사😄</h1>
     <div class="date">오늘: <span id="date"></span> (<span id="weekday"></span>)</div>
@@ -95,18 +96,17 @@
 <script>
 const sheetURL = "https://script.google.com/macros/s/AKfycbyjeIGLJPK_klICAG0viiNO5s6dQiVFXE9Jia0Dkv0eOTbBN_YhIJDfc9zD1rf6KEgu/exec";
 const now = new Date();
-const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-const today = kst.toISOString().slice(0, 10);
-const monthKey = today.slice(0, 7);
+const kst = new Date(now.getTime() + 9*60*60*1000);
+const today = kst.toISOString().slice(0,10);
+const monthKey = today.slice(0,7);
 const weekDay = ["일","월","화","수","목","금","토"];
-const dayOfWeek = kst.getUTCDay();
 document.getElementById("date").textContent = today;
-document.getElementById("weekday").textContent = weekDay[dayOfWeek];
+document.getElementById("weekday").textContent = weekDay[kst.getUTCDay()];
 
 let selectedGroup = "";
 let lastAnswer = null;
 
-function selectGroup(group) {
+function selectGroup(group){
   selectedGroup = group;
   document.getElementById("selectedGroup").textContent = group;
   document.getElementById("questionSection").style.display = "block";
@@ -114,30 +114,29 @@ function selectGroup(group) {
   updateCountsFromSheet();
 }
 
-// ✅ 오버레이 표시 (메시지 변경 가능)
-function showOverlay(message="응답이 완료되었습니다") {
+// 오버레이 메시지 표시
+function showOverlay(message){
   const overlay = document.getElementById("overlay");
   overlay.textContent = message;
   overlay.style.display = "flex";
-  setTimeout(()=>{ overlay.style.display = "none"; }, 1000);
+  setTimeout(()=>{ overlay.style.display="none"; }, 1000);
 }
 
-function submitAnswer(answer) {
-  if (!selectedGroup) { alert("먼저 어떤 친구인지 선택해주세요!"); return; }
+function submitAnswer(answer){
+  if(!selectedGroup){ alert("먼저 어떤 친구인지 선택해주세요!"); return; }
   const timestamp = new Date().toISOString();
-  showOverlay();
   fetch(sheetURL, {
     method: "POST",
     contentType: "application/json",
     body: JSON.stringify({ date: today, time: timestamp, group: selectedGroup, answer: answer })
   })
-  .then(()=>{ lastAnswer = { answer, timestamp }; updateCountsFromSheet(); })
+  .then(()=>{ lastAnswer = { answer, timestamp }; showOverlay("응답이 완료되었습니다"); updateCountsFromSheet(); })
   .catch(console.error);
 }
 
-// ✅ 취소 버튼 눌렀을 때 안내 팝업 표시
-function cancelAnswer() {
-  if (!lastAnswer) { alert("취소할 응답이 없습니다!"); return; }
+// ✅ 취소 버튼 눌렀을 때 안내 팝업이 뜨도록 수정
+function cancelAnswer(){
+  if(!lastAnswer){ alert("취소할 응답이 없습니다!"); return; }
   fetch(sheetURL, {
     method: "POST",
     contentType: "application/json",
@@ -145,13 +144,13 @@ function cancelAnswer() {
   })
   .then(()=>{
     lastAnswer = null;
+    showOverlay("응답이 취소되었습니다"); // 여기서 안내 메시지 띄움
     updateCountsFromSheet();
-    showOverlay("응답이 취소되었습니다"); // 🎯 여기서 안내 팝업 표시
   })
   .catch(console.error);
 }
 
-function updateCountsFromSheet() {
+function updateCountsFromSheet(){
   fetch(sheetURL)
     .then(res=>res.json())
     .then(data=>{
@@ -170,7 +169,7 @@ function updateCountsFromSheet() {
     .catch(console.error);
 }
 
-function requestPassword() {
+function requestPassword(){
   const pwd = prompt("관리자 비밀번호를 입력하세요:");
   if(pwd==="0219"){ 
     document.getElementById("statsTable").style.display="block"; 
@@ -178,7 +177,7 @@ function requestPassword() {
   } else { alert("비밀번호가 틀렸습니다."); }
 }
 
-function drawStatsTable(daily, monthly) {
+function drawStatsTable(daily, monthly){
   const totalMonthly = Object.values(monthly).reduce((a,b)=>a+b,0)||1;
   const makeTable = (title,data,total)=>`
     <h3>${title}</h3>
