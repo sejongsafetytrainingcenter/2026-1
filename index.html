@@ -267,8 +267,8 @@ function updateCountsFromSheet() {
       rows.forEach(row => {
 
         const date = row[0];
-        const group = row[2];
-        const answer = row[3];
+        const group = row[1];
+        const answer = row[2];
 
         if(group === selectedGroup && ["O","△","X"].includes(answer)) {
 
