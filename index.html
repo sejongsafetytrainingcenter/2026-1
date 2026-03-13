@@ -78,31 +78,38 @@ function showOverlay(msg){
     setTimeout(()=>{ overlay.style.display="none"; }, 1000);
 }
 
+// 답변 제출
 function submitAnswer(answer){
     if(!selectedGroup){ alert("먼저 그룹 선택!"); return; }
     const timestamp=new Date().toISOString();
+
     fetch(sheetURL,{
         method:"POST",
-        contentType:"application/json",
-        body:JSON.stringify({date:today,time:timestamp,group:selectedGroup,answer:answer})
-    }).then(()=>{ 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({date:today,time:timestamp,group:selectedGroup,answer:answer})
+    })
+    .then(()=>{ 
         lastAnswer={answer,timestamp}; 
         showOverlay("응답이 완료되었습니다");
         updateCountsFromSheet();
-    }).catch(console.error);
+    })
+    .catch(console.error);
 }
 
+// 답변 취소
 function cancelAnswer(){
     if(!lastAnswer){ alert("취소할 응답이 없습니다!"); return; }
     fetch(sheetURL,{
         method:"POST",
-        contentType:"application/json",
-        body:JSON.stringify({date:today,time:lastAnswer.timestamp,group:selectedGroup,answer:"취소"})
-    }).then(()=>{
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({date:today,time:lastAnswer.timestamp,group:selectedGroup,answer:"취소"})
+    })
+    .then(()=>{ 
         lastAnswer=null;
-        showOverlay("응답이 취소되었습니다"); // ✅ 여기서 팝업 뜸
+        showOverlay("응답이 취소되었습니다"); // ✅ 팝업 확실히 뜸
         updateCountsFromSheet();
-    }).catch(console.error);
+    })
+    .catch(console.error);
 }
 
 function updateCountsFromSheet(){
