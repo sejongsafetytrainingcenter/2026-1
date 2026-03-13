@@ -6,7 +6,6 @@
 <title>세종시안전체험교육원 설문</title>
 
 <style>
-
 body{
 font-family:"Comic Sans MS","Noto Sans KR",sans-serif;
 background:#fff8f0;
@@ -139,7 +138,6 @@ color:#ff7043;
 font-weight:bold;
 display:none;
 }
-
 </style>
 
 </head>
@@ -192,54 +190,4 @@ const weekDay=["일","월","화","수","목","금","토"];
 
 const d=new Date();
 
-document.getElementById("date").textContent=today;
-document.getElementById("weekday").textContent=weekDay[d.getDay()];
-
-let selectedGroup="";
-let lastAnswer=null;
-
-function selectGroup(group){
-
-selectedGroup=group;
-
-document.getElementById("questionSection").style.display="block";
-document.getElementById("groupButtons").style.display="none";
-
-}
-
-function showOverlay(){
-
-const overlay=document.getElementById("overlay");
-
-overlay.style.display="flex";
-
-setTimeout(()=>{overlay.style.display="none"},1000);
-
-}
-
-function submitAnswer(answer){
-
-if(!selectedGroup){
-alert("먼저 어떤 친구인지 선택해주세요!");
-return;
-}
-
-const timestamp=new Date().toISOString();
-
-showOverlay();
-
-fetch(sheetURL,{
-method:"POST",
-contentType:"application/json",
-body:JSON.stringify({
-date:today,
-time:timestamp,
-group:selectedGroup,
-answer:answer
-})
-})
-
-.then(r=>r.text())
-.then(()=>{
-
-lastAnswer={answer,timestamp}
+document.getElementById("date").textContent=
