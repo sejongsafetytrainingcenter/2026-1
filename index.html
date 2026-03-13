@@ -18,6 +18,10 @@ h1 { color:#ff6f00; font-size:2em; }
 .red { background-color:#e57373; }
 .cancel-btn, .hide-stats-btn { margin-top:20px; font-size:0.9em; padding:8px 16px; cursor:pointer; border:none; border-radius:10px; color:white; background-color:#64b5f6; }
 .overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.95); z-index:9999; display:flex; align-items:center; justify-content:center; font-size:3em; color:#333; font-weight:bold; display:none; }
+.stats { margin-top:40px; display:none; }
+table { border-collapse:collapse; margin:20px auto; }
+table, th, td { border:1px solid #aaa; padding:8px 12px; }
+th { background-color:#f0f0f0; }
 </style>
 </head>
 <body>
@@ -63,6 +67,7 @@ document.getElementById("weekday").textContent=weekDay[kst.getUTCDay()];
 let selectedGroup="";
 let lastAnswer=null;
 
+// 그룹 선택
 function selectGroup(group){
     selectedGroup=group;
     document.getElementById("selectedGroup").textContent=group;
@@ -71,29 +76,27 @@ function selectGroup(group){
     updateCountsFromSheet();
 }
 
+// 오버레이 표시
 function showOverlay(msg){
     const overlay=document.getElementById("overlay");
     overlay.textContent=msg;
     overlay.style.display="flex";
-    setTimeout(()=>{ overlay.style.display="none"; }, 1000);
+    setTimeout(()=>{ overlay.style.display="none"; },1000);
 }
 
 // 답변 제출
 function submitAnswer(answer){
     if(!selectedGroup){ alert("먼저 그룹 선택!"); return; }
     const timestamp=new Date().toISOString();
-
     fetch(sheetURL,{
         method:"POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type":"application/json"},
         body: JSON.stringify({date:today,time:timestamp,group:selectedGroup,answer:answer})
-    })
-    .then(()=>{ 
+    }).then(()=>{ 
         lastAnswer={answer,timestamp}; 
-        showOverlay("응답이 완료되었습니다");
+        showOverlay("응답이 완료되었습니다"); // 오버레이
         updateCountsFromSheet();
-    })
-    .catch(console.error);
+    }).catch(console.error);
 }
 
 // 답변 취소
@@ -101,17 +104,16 @@ function cancelAnswer(){
     if(!lastAnswer){ alert("취소할 응답이 없습니다!"); return; }
     fetch(sheetURL,{
         method:"POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type":"application/json"},
         body: JSON.stringify({date:today,time:lastAnswer.timestamp,group:selectedGroup,answer:"취소"})
-    })
-    .then(()=>{ 
+    }).then(()=>{
         lastAnswer=null;
-        showOverlay("응답이 취소되었습니다"); // ✅ 팝업 확실히 뜸
+        showOverlay("응답이 취소되었습니다"); // ✅ 확실히 팝업
         updateCountsFromSheet();
-    })
-    .catch(console.error);
+    }).catch(console.error);
 }
 
+// 시트에서 통계 가져오기
 function updateCountsFromSheet(){
     fetch(sheetURL)
     .then(res=>res.json())
@@ -130,14 +132,16 @@ function updateCountsFromSheet(){
     }).catch(console.error);
 }
 
+// 통계 보기
 function requestPassword(){
-    const pwd=prompt("관리자 비밀번호를 입력하세요:");
+    const pwd = prompt("관리자 비밀번호를 입력하세요:");
     if(pwd==="0219"){ 
         document.getElementById("statsTable").style.display="block"; 
         updateCountsFromSheet();
     } else alert("비밀번호가 틀렸습니다.");
 }
 
+// 통계 테이블 그리기
 function drawStatsTable(daily,monthly){
     const totalMonthly=Object.values(monthly).reduce((a,b)=>a+b,0)||1;
     const makeTable=(title,data,total)=>`
